@@ -1,0 +1,10 @@
+
+        a: integer;
+        b: array [3] of float;
+        foo: function integer(a:integer, b:array [10] of float) {
+            c:array [3] of integer;
+            if (a>0)
+                foo(a-1, b);
+            return c;
+        }
+            

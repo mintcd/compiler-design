@@ -1,0 +1,5 @@
+
+        main: function void() {
+            a,b,c: auto = 1,"Hell",{{1,2},{21,7},{16,4}};
+        }
+        

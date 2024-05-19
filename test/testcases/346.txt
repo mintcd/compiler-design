@@ -1,0 +1,4 @@
+fact: function integer (arr: array [1] of integer){
+            return arr[arr[arr[0]]] % 3 == 0;
+        }
+        

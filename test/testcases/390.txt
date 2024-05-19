@@ -1,0 +1,14 @@
+
+        main:function void () {
+            number:integer;
+            //printf() displays the formatted output 
+            printf("Enter an integer: ");
+
+            //scanf() reads the formatted input and stores them
+            //scanf("%d", &number);
+
+            //printf() displays the formatted output
+            printInteger("You entered: %d", number);
+            return 0;
+        }
+            

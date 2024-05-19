@@ -1,0 +1,1 @@
+Type mismatch in expression: BinExpr(::, StringLit(dgjhdf), FuncCall(foo, [BinExpr(+, Id(a), FuncCall(foo, [Id(a), StringLit(daaad)])), StringLit()]))

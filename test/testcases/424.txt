@@ -1,0 +1,16 @@
+
+        main: function void() {
+            a,b,c: auto = 1,"Hell",{{1,2},{21,7},{16,4}};
+            printFloat(a);
+            b = readString();
+            printFloat(c[0,0]);
+        }
+
+        foo: function auto(a: float) {
+            if (a < 1) return a;
+            else return 0;
+            return 0.0003;
+            return "hkshds";
+            if (a < 1) return true;
+        }
+        

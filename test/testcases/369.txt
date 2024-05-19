@@ -1,0 +1,5 @@
+main: function void (a:integer) {
+            n: array [6] of boolean;
+            n = foo(v[b+c-d/e*9]);
+
+        }

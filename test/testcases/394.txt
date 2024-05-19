@@ -1,0 +1,22 @@
+
+		/*Enter and print an array of integers*/
+		a:array [10] of integer;
+        b:integer;
+		enter:function void(a: array [10] of integer, n:integer) {
+			j:array [2] of integer;
+            i:integer;
+			for (i = 0, i < n,i + 1) {
+				printString("Enter an integer: ");
+            	readInteger (a[i]);
+			}
+		}
+		print:function void(a:array [10] of integer, n:integer) {
+			i:integer;
+			for (i = 0, i < n, i + 1) printInteger("hihi, ", a[i]);
+		}
+		main:function integer() {
+			enter(a, 10);
+			printA(a, 10);
+			return 0;
+		}
+            

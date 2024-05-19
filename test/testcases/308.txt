@@ -1,0 +1,5 @@
+main: function void () {
+            printInteger(4);
+            a: array [1,2] of integer;
+
+        }

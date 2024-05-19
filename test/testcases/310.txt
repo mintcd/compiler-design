@@ -1,0 +1,7 @@
+
+        main: function void(){
+            //a:integer;
+        }
+        func: function void(a:array [10] of integer,arr: string){
+            return 0;
+        }

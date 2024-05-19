@@ -1,0 +1,12 @@
+
+        mom: function void(out a: auto, inherit b: auto, c: auto) {}
+
+        child: function void(a: string) inherit mom {
+            super(a,b,b);
+            b = true;
+        }
+
+        main: function void() {
+            mom("ds",true,false);
+        }
+        

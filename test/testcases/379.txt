@@ -1,0 +1,5 @@
+main: function void() {
+            local_var: integer;
+            a = !abc + -45 ;
+            return local_var >= a;
+            }

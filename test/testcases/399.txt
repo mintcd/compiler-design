@@ -1,0 +1,6 @@
+
+        /* Comment */
+        fn: function array[1] of boolean (cd: auto, temp: string) {
+            a=c[c[c[c[c[c12]]]]];
+            b=b[1,1,1,1,1];
+        }

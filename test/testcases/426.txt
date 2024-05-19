@@ -1,0 +1,11 @@
+
+        main: function void() {
+            a: auto = 0;
+            b: integer = foo(a+foo(a,"daaad"),"") + 1;
+        }
+
+        foo: function auto(a: auto, b: auto) {
+            b = "ffhg";
+            return a;
+        }
+        

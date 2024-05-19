@@ -1,0 +1,5 @@
+Program([
+	VarDecl(a, AutoType, BinExpr(==, Id(x), Id(y)))
+	VarDecl(b, AutoType, ArrayLit([BinExpr(-, BinExpr(*, Id(x), Id(y)), Id(z)), BinExpr(/, BinExpr(*, BinExpr(+, Id(x), Id(y)), Id(z)), BinExpr(-, Id(x), Id(y)))]))
+	VarDecl(c, AutoType, BinExpr(::, StringLit(Hello ), StringLit(World!)))
+])

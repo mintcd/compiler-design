@@ -1,0 +1,11 @@
+
+        i:integer;
+        f:function integer() {
+            return 200;
+        }
+        main:function void () {
+            main:integer ;
+            main = f() ;
+            printInteger( main ) ;
+        }
+            

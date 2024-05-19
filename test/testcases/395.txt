@@ -1,0 +1,15 @@
+
+		/*Enter and print an array of integers*/
+		main:function integer(a:integer,v:integer) {
+            if (a + b < 1 * 3 / 7){
+                c:array [4] of integer;
+                a:integer;
+                if (!(a - b))
+                    return 0;
+                else{
+                }
+            }
+            else
+                return 10;
+		}
+            

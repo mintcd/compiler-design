@@ -1,0 +1,3 @@
+test: function void (a: integer,b:integer){
+                x:integer = 1+2*4+7;
+            }

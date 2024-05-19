@@ -1,0 +1,8 @@
+test: function integer () {
+            do {
+                do {
+                }
+                while (a>=abc);
+            }
+            while (a<-2);
+        }

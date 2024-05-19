@@ -1,0 +1,7 @@
+main: function void(){
+            if (t == 1) {
+                if (a  < 1) a = 2;
+                else k = foo(a);
+            }
+            else k = foo(a - 1);
+        }

@@ -1,0 +1,1 @@
+Type mismatch in statement: ForStmt(AssignStmt(Id(a), IntegerLit(8)), BooleanLit(True), FloatLit(9.0), CallStmt(printInteger, FuncCall(foo, [])))

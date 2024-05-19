@@ -1,0 +1,5 @@
+Program([
+	VarDecl(flag, BooleanType)
+	FuncDecl(round, IntegerType, [Param(a, FloatType)], None, BlockStmt([]))
+	FuncDecl(main, VoidType, [], None, BlockStmt([VarDecl(number, FloatType), AssignStmt(Id(flag), BooleanLit(True)), DoWhileStmt(Id(flag), BlockStmt([AssignStmt(Id(number), BinExpr(/, FuncCall(random, [IntegerLit(1), IntegerLit(200)]), IntegerLit(10))), IfStmt(BinExpr(==, Id(number), FuncCall(round, [Id(number)])), AssignStmt(Id(flag), BooleanLit(False)))])), CallStmt(writeFloat, Id(number))]))
+])

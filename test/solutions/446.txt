@@ -1,0 +1,1 @@
+Type mismatch in statement: WhileStmt(BinExpr(+, UnExpr(-, Id(a)), IntegerLit(8)), CallStmt(printInteger, FuncCall(foo, [])))

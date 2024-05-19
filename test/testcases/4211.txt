@@ -1,0 +1,8 @@
+
+        main: function void() {
+            a,b,c: auto = 1,"Hell",{{1,2},{21.9,7},{16,4}};
+            printFloat(a);
+            b = readString();
+            printInteger(c[0,0]);
+        }
+        

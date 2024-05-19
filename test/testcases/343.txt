@@ -1,0 +1,6 @@
+a: float;
+        b: array [2] of integer;
+        main: function void (){
+            c : integer;
+            a = a * b[0] + (a - 3) * b[1];
+        }

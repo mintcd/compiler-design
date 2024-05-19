@@ -1,0 +1,6 @@
+find_gcd:function integer(n1: integer,n2: integer)
+        {
+            if (n2 != 0)
+            return find_gcd(n2, n1%n2);
+            else return n1;
+        }

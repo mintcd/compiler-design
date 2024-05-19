@@ -1,0 +1,12 @@
+/*This is a program*/
+        flag: boolean;
+        round:function integer (a:float){}
+        main:function void() {
+            number: float;
+            flag=true;
+            do {
+                number = random(1, 200) / 10;
+                if (number == round(number)) flag = false;
+            } while (flag);
+            writeFloat(number);
+        }

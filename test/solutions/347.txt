@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(find_gcd, IntegerType, [Param(n1, IntegerType), Param(n2, IntegerType)], None, BlockStmt([IfStmt(BinExpr(!=, Id(n2), IntegerLit(0)), ReturnStmt(FuncCall(find_gcd, [Id(n2), BinExpr(%, Id(n1), Id(n2))])), ReturnStmt(Id(n1)))]))
+])

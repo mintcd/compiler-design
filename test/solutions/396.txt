@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(foo, IntegerType, [], None, BlockStmt([WhileStmt(BinExpr(==, Id(x), BinExpr(&&, BooleanLit(True), BooleanLit(False))), WhileStmt(BinExpr(==, Id(x), BinExpr(&&, BooleanLit(True), BooleanLit(False))), WhileStmt(BinExpr(==, Id(x), BinExpr(&&, BooleanLit(True), BooleanLit(False))), WhileStmt(BinExpr(==, Id(x), BinExpr(&&, BooleanLit(True), BooleanLit(False))), WhileStmt(BinExpr(==, Id(x), BinExpr(&&, BooleanLit(True), BooleanLit(False))), ReturnStmt(BinExpr(+, FuncCall(main, []), Id(x))))))))]))
+])

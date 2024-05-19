@@ -1,0 +1,11 @@
+
+        main: function void() {
+            a: auto = 0;
+            b: auto = "dgjhdf"::foo(a+foo(a,"daaad"),"");
+        }
+
+        foo: function auto(a: auto, b: auto) {
+            b = "ffhg";
+            return a;
+        }
+        

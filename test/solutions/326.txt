@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(main, VoidType, [], None, BlockStmt([ForStmt(AssignStmt(Id(i), IntegerLit(0)), BinExpr(<, Id(i), IntegerLit(10)), BinExpr(+, Id(i), IntegerLit(1)), ForStmt(AssignStmt(Id(j), IntegerLit(0)), BinExpr(<, Id(j), Id(i)), BinExpr(+, Id(j), IntegerLit(1)), AssignStmt(Id(sum), BinExpr(+, Id(sum), IntegerLit(1))))), CallStmt(printInteger, Id(sum))]))
+])

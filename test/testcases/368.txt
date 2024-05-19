@@ -1,0 +1,4 @@
+main: function void (a:integer) {
+            n: array [6] of float;
+            n = foo(v[-3]);
+        }

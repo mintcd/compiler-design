@@ -1,0 +1,6 @@
+
+        main: function integer() {}
+        main: function float(x: integer) {
+            if (x && x && x) return 0;
+            return x;    
+        }

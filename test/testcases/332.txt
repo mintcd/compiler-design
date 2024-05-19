@@ -1,0 +1,9 @@
+main: function void (){
+            k,c: integer;
+            do{
+                do{
+                    c: array [3] of integer;
+                } while (x < 4);
+            } while (k == 0);
+            return 0;
+        }

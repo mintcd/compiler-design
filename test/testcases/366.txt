@@ -1,0 +1,4 @@
+main: function void (a:integer) {
+            t: float;
+            t = a + b[1 + 3];
+        }

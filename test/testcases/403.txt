@@ -1,0 +1,3 @@
+x: integer;
+        y: boolean;
+        x: string;

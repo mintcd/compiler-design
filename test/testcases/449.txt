@@ -1,0 +1,11 @@
+
+        main: function void() {
+            a: string = "wtfyt";
+            do {
+                a: auto = 123;
+                printInteger(a);
+            }
+            while (!foo());
+        }
+        foo: function auto() {}
+        

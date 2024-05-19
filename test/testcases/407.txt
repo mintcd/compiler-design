@@ -1,0 +1,1 @@
+foo: function void(x: integer, x:string){}

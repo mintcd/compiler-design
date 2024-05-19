@@ -1,0 +1,12 @@
+
+        main: function void() {
+            a: auto = {{1},{2},{3}};
+            b: integer;
+            do {
+                printInteger(b);
+                if (true)
+                    {{{{continue;}}}}
+            }
+            while (a[1,0] > 0.1);
+        }
+        

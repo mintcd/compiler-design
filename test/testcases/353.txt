@@ -1,0 +1,5 @@
+test: function integer () {
+            while (true)
+                while (true)
+                    while (true) a= a-1;
+        }

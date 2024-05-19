@@ -1,0 +1,10 @@
+
+        main: function void() {
+            a: auto = 123;
+            if (foo()>a) {
+                printInteger(foo());
+            }
+        }
+
+        foo: function auto() {}
+        

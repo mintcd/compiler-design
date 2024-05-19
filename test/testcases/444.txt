@@ -1,0 +1,7 @@
+
+        main: function void() {
+            a: auto = 123;
+            for (a = 8, true, 9.0) printInteger(foo());
+        }
+        foo: function integer() {}
+        

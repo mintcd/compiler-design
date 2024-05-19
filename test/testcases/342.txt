@@ -1,0 +1,6 @@
+main: function void (){
+            a, b: integer;
+            a = 3;
+            b = 5;
+            a = (6 - 5 * (b % a));
+        }

@@ -1,0 +1,12 @@
+
+        main: function void() {
+            a: float;
+            b: float = 3.4;
+            printFloat(foo(b));
+        }
+
+        foo: function auto(a: float) {
+            if (a < 1) return a;
+            return 2;
+        }
+        

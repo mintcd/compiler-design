@@ -1,0 +1,4 @@
+main: function void (a:integer) {
+            trend: string;
+            trend = (foo(1) + foo(2))+v[1 + 9];
+        }

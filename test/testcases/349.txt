@@ -1,0 +1,11 @@
+isPrime:function boolean(n: integer){
+            i, flag: integer;
+            for(i=2, i <= n/2, i+1){
+                if (n % i == 0)
+                {
+                    flag = 0;
+                    break;
+                }
+            }
+            return flag;
+        }

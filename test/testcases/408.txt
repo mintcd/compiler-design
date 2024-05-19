@@ -1,0 +1,1 @@
+foo: function void(inherit y: float, out x: integer, inherit out z: string, x:array[1,2,3,4] of integer, z: boolean){}

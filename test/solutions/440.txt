@@ -1,0 +1,1 @@
+Type mismatch in statement: IfStmt(BinExpr(+, Id(a), IntegerLit(8)), CallStmt(printInteger, FuncCall(foo, [])))

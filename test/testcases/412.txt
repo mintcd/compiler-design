@@ -1,0 +1,2 @@
+x: function string(y: integer){}
+        y: auto = x(z);

@@ -1,0 +1,182 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    AND
+    ARRAY
+    ASSIGN
+    AUTO
+    BOOLEAN
+    BOOLEANLIT
+    BREAK
+    CL
+    CM
+    CONCATE
+    CONTINUE
+    DIV
+    DO
+    DOT
+    ELSE
+    EQUAL
+    FLOAT
+    FLOATLIT
+    FOR
+    FUNCTION
+    GE
+    GT
+    IF
+    INHERIT
+    INTEGER
+    LB
+    LE
+    LP
+    LSB
+    LT
+    MOD
+    MUL
+    NOT
+    NOT_EQUAL
+    OF
+    OR
+    OUT
+    RB
+    RETURN
+    RP
+    RSB
+    SM
+    STRING
+    STRINGLIT
+    SUB
+    VOID
+    WHILE
+
+Grammar
+
+Rule 0     S' -> expr
+Rule 1     expr -> expr ADD expr
+Rule 2     expr -> INTLIT
+Rule 3     expr -> ID
+
+Terminals, with rules where they appear
+
+ADD                  : 1
+AND                  : 
+ARRAY                : 
+ASSIGN               : 
+AUTO                 : 
+BOOLEAN              : 
+BOOLEANLIT           : 
+BREAK                : 
+CL                   : 
+CM                   : 
+CONCATE              : 
+CONTINUE             : 
+DIV                  : 
+DO                   : 
+DOT                  : 
+ELSE                 : 
+EQUAL                : 
+FLOAT                : 
+FLOATLIT             : 
+FOR                  : 
+FUNCTION             : 
+GE                   : 
+GT                   : 
+ID                   : 3
+IF                   : 
+INHERIT              : 
+INTEGER              : 
+INTLIT               : 2
+LB                   : 
+LE                   : 
+LP                   : 
+LSB                  : 
+LT                   : 
+MOD                  : 
+MUL                  : 
+NOT                  : 
+NOT_EQUAL            : 
+OF                   : 
+OR                   : 
+OUT                  : 
+RB                   : 
+RETURN               : 
+RP                   : 
+RSB                  : 
+SM                   : 
+STRING               : 
+STRINGLIT            : 
+SUB                  : 
+VOID                 : 
+WHILE                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+expr                 : 1 1 0
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . expr
+    (1) expr -> . expr ADD expr
+    (2) expr -> . INTLIT
+    (3) expr -> . ID
+
+    INTLIT          shift and go to state 2
+    ID              shift and go to state 3
+
+    expr                           shift and go to state 1
+
+state 1
+
+    (0) S' -> expr .
+    (1) expr -> expr . ADD expr
+
+    ADD             shift and go to state 4
+
+
+state 2
+
+    (2) expr -> INTLIT .
+
+    ADD             reduce using rule 2 (expr -> INTLIT .)
+    $end            reduce using rule 2 (expr -> INTLIT .)
+
+
+state 3
+
+    (3) expr -> ID .
+
+    ADD             reduce using rule 3 (expr -> ID .)
+    $end            reduce using rule 3 (expr -> ID .)
+
+
+state 4
+
+    (1) expr -> expr ADD . expr
+    (1) expr -> . expr ADD expr
+    (2) expr -> . INTLIT
+    (3) expr -> . ID
+
+    INTLIT          shift and go to state 2
+    ID              shift and go to state 3
+
+    expr                           shift and go to state 5
+
+state 5
+
+    (1) expr -> expr ADD expr .
+    (1) expr -> expr . ADD expr
+
+  ! shift/reduce conflict for ADD resolved as shift
+    $end            reduce using rule 1 (expr -> expr ADD expr .)
+    ADD             shift and go to state 4
+
+  ! ADD             [ reduce using rule 1 (expr -> expr ADD expr .) ]
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for ADD in state 5 resolved as shift

@@ -1,0 +1,16 @@
+
+		foo: function integer(){
+            do{
+                 a = a-1;
+                //Fighting!!
+                //break;
+                do{
+                    f = sqrt(a*a + b*b + c*c);
+                    if ((1>=0)== 2+a[1]+c+("abc"< 0)) { break; }
+                    else {} 
+                } 
+                while (a>0);
+                //?/@!$$%**())               
+            } while (a!=b) ;
+        }
+            

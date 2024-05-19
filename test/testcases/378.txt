@@ -1,0 +1,6 @@
+main: function void() {
+            local_var: integer;
+            local_var = local[1 + x] - 4 * 5;
+            a = min == 15 * 123 + (1 + 3);
+            //return local_var + 1;
+            }

@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(main, VoidType, [], None, BlockStmt([VarDecl(n, IntegerType), VarDecl(count, IntegerType), AssignStmt(Id(count), IntegerLit(0)), CallStmt(printString, StringLit(Enter an integer: )), CallStmt(readInteger, StringLit(%d), Id(n)), DoWhileStmt(BinExpr(!=, Id(n), IntegerLit(0)), BlockStmt([AssignStmt(Id(n), BinExpr(/, Id(n), IntegerLit(10))), AssignStmt(Id(count), BinExpr(+, Id(count), IntegerLit(1)))])), CallStmt(printInteger, StringLit(Number of digits: %d), Id(count)), ReturnStmt(IntegerLit(0))]))
+])

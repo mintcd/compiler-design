@@ -1,0 +1,7 @@
+
+        main:function void () {
+            // printf() displays the string inside quotation
+            printString("Hello, World!");
+            return 0;
+        }
+            

@@ -1,0 +1,5 @@
+Program([
+	FuncDecl(main, VoidType, [], None, BlockStmt([]))
+	FuncDecl(func, VoidType, [Param(a, ArrayType([7], IntegerType)), Param(arr, StringType)], None, BlockStmt([ReturnStmt(IntegerLit(0))]))
+	FuncDecl(test, IntegerType, [Param(input, ArrayType([13], FloatType)), Param(a, IntegerType), Param(c, ArrayType([10], StringType)), Param(d, BooleanType)], None, BlockStmt([VarDecl(a, IntegerType), VarDecl(b, IntegerType), VarDecl(c, IntegerType), ReturnStmt(Id(a))]))
+])

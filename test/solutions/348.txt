@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(sumArray, IntegerType, [Param(n1, ArrayType([100], IntegerType)), Param(n2, IntegerType)], None, BlockStmt([VarDecl(i, IntegerType), VarDecl(sum, IntegerType), AssignStmt(Id(sum), IntegerLit(0)), ForStmt(AssignStmt(Id(i), IntegerLit(0)), BinExpr(<, Id(i), Id(n2)), BinExpr(+, Id(i), IntegerLit(1)), BlockStmt([AssignStmt(Id(sum), BinExpr(+, Id(sum), ArrayCell(n1, [Id(i)])))])), ReturnStmt(Id(sum))]))
+])

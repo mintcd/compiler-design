@@ -1,0 +1,8 @@
+
+        main: function void() {
+            a: array[1,2,2] of boolean = {{{true,false},{true,foo()}}};
+            printBoolean(foo());
+        }
+
+        foo: function auto() {}
+        

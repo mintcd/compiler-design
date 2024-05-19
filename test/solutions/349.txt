@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(isPrime, BooleanType, [Param(n, IntegerType)], None, BlockStmt([VarDecl(i, IntegerType), VarDecl(flag, IntegerType), ForStmt(AssignStmt(Id(i), IntegerLit(2)), BinExpr(<=, Id(i), BinExpr(/, Id(n), IntegerLit(2))), BinExpr(+, Id(i), IntegerLit(1)), BlockStmt([IfStmt(BinExpr(==, BinExpr(%, Id(n), Id(i)), IntegerLit(0)), BlockStmt([AssignStmt(Id(flag), IntegerLit(0)), BreakStmt()]))])), ReturnStmt(Id(flag))]))
+])

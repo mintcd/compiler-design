@@ -1,0 +1,10 @@
+/*This is a program*/
+        main:function void() {
+            n, i: integer;
+            n = 100;
+            for (i = 0, true, i + 1)
+            {
+                n = n - i;
+                if (n < i) break;
+            }
+        }

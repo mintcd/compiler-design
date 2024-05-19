@@ -1,0 +1,17 @@
+
+        main:function void () {
+            main:integer ;
+            main = f() ;
+            printInteger( main ) ;
+            {
+                i:integer ;
+                main:integer ;
+                f:integer ;
+                main = e*f+g/h*10010;
+                printInteger( i ) ;
+                printInteger( main ) ;
+                printInteger ( f ) ;
+            }
+            printInteger( main ) ;
+        }
+            

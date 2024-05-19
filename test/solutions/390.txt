@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(main, VoidType, [], None, BlockStmt([VarDecl(number, IntegerType), CallStmt(printf, StringLit(Enter an integer: )), CallStmt(printInteger, StringLit(You entered: %d), Id(number)), ReturnStmt(IntegerLit(0))]))
+])

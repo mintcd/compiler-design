@@ -1,0 +1,7 @@
+
+            main:function integer(){
+                    a[b[2]] = 10;
+                    name();
+                    return;
+                }
+            

@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(main, VoidType, [Param(a, IntegerType)], None, BlockStmt([AssignStmt(Id(sum), BinExpr(+, BinExpr(-, ArrayCell(foo, [BinExpr(*, IntegerLit(5), FuncCall(foo, []))]), UnExpr(!, ArrayCell(tran, [BinExpr(%, IntegerLit(5), FuncCall(tran, []))]))), UnExpr(-, FuncCall(foo, [ArrayCell(a, [BinExpr(*, IntegerLit(3), ArrayCell(b, [Id(c)]))])]))))]))
+])

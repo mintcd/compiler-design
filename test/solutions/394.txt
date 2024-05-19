@@ -1,0 +1,7 @@
+Program([
+	VarDecl(a, ArrayType([10], IntegerType))
+	VarDecl(b, IntegerType)
+	FuncDecl(enter, VoidType, [Param(a, ArrayType([10], IntegerType)), Param(n, IntegerType)], None, BlockStmt([VarDecl(j, ArrayType([2], IntegerType)), VarDecl(i, IntegerType), ForStmt(AssignStmt(Id(i), IntegerLit(0)), BinExpr(<, Id(i), Id(n)), BinExpr(+, Id(i), IntegerLit(1)), BlockStmt([CallStmt(printString, StringLit(Enter an integer: )), CallStmt(readInteger, ArrayCell(a, [Id(i)]))]))]))
+	FuncDecl(print, VoidType, [Param(a, ArrayType([10], IntegerType)), Param(n, IntegerType)], None, BlockStmt([VarDecl(i, IntegerType), ForStmt(AssignStmt(Id(i), IntegerLit(0)), BinExpr(<, Id(i), Id(n)), BinExpr(+, Id(i), IntegerLit(1)), CallStmt(printInteger, StringLit(hihi, ), ArrayCell(a, [Id(i)])))]))
+	FuncDecl(main, IntegerType, [], None, BlockStmt([CallStmt(enter, Id(a), IntegerLit(10)), CallStmt(printA, Id(a), IntegerLit(10)), ReturnStmt(IntegerLit(0))]))
+])

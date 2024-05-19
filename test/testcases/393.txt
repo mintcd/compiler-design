@@ -1,0 +1,21 @@
+
+		convertBinarytoOctal:function integer(binaryNumber:integer){
+		/*Function convert binary to Octal */
+
+                octalNumber, decimalNumber, i:integer;
+                octalNumber = decimalNumber -i + 0;
+                do {
+                    decimalNumber = decimalNumber + (binaryNumber%10);
+                    i = i + 1;
+                    binaryNumber = binaryNumber / 10;
+                }while (binaryNumber != 0);
+                i = 1;
+                do {
+                    octalNumber = octalNumber + (decimalNumber % 8) * i;
+                    decimalNumber = decimalNumber / 8;
+                    i = i * 10;
+                }while (decimalNumber != 0);
+        
+                return octalNumber;
+            }
+            

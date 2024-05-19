@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(main, VoidType, [], None, BlockStmt([IfStmt(FuncCall(isPrime, [Id(n)]), BlockStmt([IfStmt(BinExpr(>, Id(n), IntegerLit(999)), AssignStmt(Id(flag), BooleanLit(True)), BlockStmt([AssignStmt(Id(n), BinExpr(+, IntegerLit(3), BinExpr(*, Id(n), IntegerLit(7)))), CallStmt(printInteger, Id(n))]))]), CallStmt(printString, StringLit(n isn\'t a prime number!)))]))
+])

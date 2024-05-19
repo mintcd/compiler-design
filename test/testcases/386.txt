@@ -1,0 +1,14 @@
+
+        foo:function integer (a:integer, b:array [10] of float)
+        {
+            c:boolean;
+            i:integer;
+            i = a + 3 ;
+            if (i > 0) {
+                d:integer;
+                d = i + 3;
+                printInteger( d );
+            }
+            return i;
+        }
+            

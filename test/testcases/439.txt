@@ -1,0 +1,10 @@
+
+        main: function void() {
+            a: auto = 123.9;
+            if (a+8 == 4) {
+                printInteger(foo());
+            }
+        }
+
+        foo: function auto() {}
+        

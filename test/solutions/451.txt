@@ -1,0 +1,1 @@
+Type mismatch in statement: DoWhileStmt(BinExpr(-, IntegerLit(2), FuncCall(foo, [])), BlockStmt([VarDecl(a, AutoType, IntegerLit(123)), CallStmt(printInteger, Id(b))]))

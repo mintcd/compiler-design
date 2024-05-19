@@ -1,0 +1,6 @@
+
+        main: function void() {
+            a: string = foo;
+        }
+        foo: function string(a: auto, b: auto) {}
+        

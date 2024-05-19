@@ -1,0 +1,7 @@
+main: function void(){}
+                foo: function auto(){}
+                bar: function auto(){}
+                zar: function auto(){}
+                a: auto = {{1,2},foo(), {bar(), zar()}};
+                b,c: integer = bar(), zar();
+                d: array[2] of boolean = foo();

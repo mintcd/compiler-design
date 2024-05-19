@@ -1,0 +1,8 @@
+foo: function integer () {
+            while (x == true && false)
+                while (x == true && false)
+                    while (x == true && false)
+                        while (x == true && false)
+                            while (x == true && false)
+                                return main() + x;
+        }

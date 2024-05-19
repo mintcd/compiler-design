@@ -1,0 +1,2 @@
+foo: function integer(){bar();}
+        

@@ -1,0 +1,18 @@
+
+        main: function void() {
+            a: string = "wtfyt";
+            b: integer;
+            do {
+                a: auto = 123;
+                printInteger(b);
+            }
+            while (!foo());
+        }
+        b: string;
+        foo: function auto() {
+            return true;
+            if (!foo())
+                return a;
+            while (false) return "false";
+        }
+        

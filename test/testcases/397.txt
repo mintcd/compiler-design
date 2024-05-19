@@ -1,0 +1,8 @@
+
+        // asdfasdfadfadfasdfasd
+        main: function integer () {
+            {{{
+                {{}}
+            }}}
+            return;
+        }

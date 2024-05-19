@@ -1,0 +1,3 @@
+Program([
+	FuncDecl(foo, IntegerType, [], None, BlockStmt([DoWhileStmt(BinExpr(!=, Id(a), Id(b)), BlockStmt([AssignStmt(Id(a), BinExpr(-, Id(a), IntegerLit(1))), BreakStmt(), DoWhileStmt(BinExpr(>, Id(a), IntegerLit(0)), BlockStmt([AssignStmt(Id(f), FuncCall(sqrt, [BinExpr(+, BinExpr(+, BinExpr(*, Id(a), Id(a)), BinExpr(*, Id(b), Id(b))), BinExpr(*, Id(c), Id(c)))])), IfStmt(BinExpr(==, BinExpr(>=, IntegerLit(1), IntegerLit(0)), BinExpr(+, BinExpr(+, BinExpr(+, IntegerLit(2), ArrayCell(a, [IntegerLit(1)])), Id(c)), BinExpr(<, StringLit(abc), IntegerLit(0)))), BlockStmt([BreakStmt()]), BlockStmt([]))]))]))]))
+])

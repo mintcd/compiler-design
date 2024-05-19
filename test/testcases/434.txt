@@ -1,0 +1,6 @@
+
+        main: function void() {
+            a: float;
+            a = "Hello"::"me";
+        }
+        

@@ -1,0 +1,10 @@
+main: function void(){
+            if (isPrime(n)) {
+                if (n > 999) flag = true; //check if n > 999
+                else {
+                    n = 3 + n * 7;
+                    printInteger(n);
+                }
+            }
+            else printString("n isn\'t a prime number!");
+        }

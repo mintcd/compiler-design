@@ -1,0 +1,6 @@
+Program([
+	VarDecl(a, AutoType, StringLit(hi))
+	VarDecl(b, AutoType, IntegerLit(1))
+	VarDecl(c, AutoType, Id(_))
+	VarDecl(d, AutoType, FloatLit(2100.0))
+])

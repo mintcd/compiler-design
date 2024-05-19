@@ -1,0 +1,8 @@
+
+        main: function void() {}
+
+        mom: function void(a: auto, b: integer, c: auto) {}
+
+        child: function void() inherit mom {}
+
+        

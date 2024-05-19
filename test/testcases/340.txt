@@ -1,0 +1,6 @@
+main: function integer (a:integer, b: integer){
+                    if(a>1) return a;
+                    else if (a<1) return b;
+                    else return 1;
+                }
+                

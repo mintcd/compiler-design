@@ -1,0 +1,14 @@
+
+        nah: function float(){
+				s:integer;
+                {
+                    if (s > 10) break;
+					else {
+                        do {
+                        a = a + 1;
+                        }
+                        while(true);
+                    }
+                }
+            }
+            

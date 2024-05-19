@@ -1,0 +1,11 @@
+
+            A : function void(a : integer, b : auto) {
+            
+            }
+            B : function void () inherit A {
+                a : integer;
+            }
+            main: function void() {
+                
+            }
+        

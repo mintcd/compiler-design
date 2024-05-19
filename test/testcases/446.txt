@@ -1,0 +1,7 @@
+
+        main: function void() {
+            a: auto = 1.0;
+            while (-a + 8) printInteger(foo());
+        }
+        foo: function integer() {}
+        

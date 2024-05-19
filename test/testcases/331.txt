@@ -1,0 +1,6 @@
+main: function void (){
+            do {
+                x = x + 3;
+                i = i + 1;
+            } while (i<3);
+        }

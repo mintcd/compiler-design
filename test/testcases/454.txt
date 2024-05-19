@@ -1,0 +1,13 @@
+
+        main: function void() {
+            a: auto = {{1},{2},{3}};
+            b: integer;
+            while (a[1,0] > 0.1)
+                while (a[1,0] > 0.1)
+                    while (a[1,0] > 0.1) {
+                        break;
+                        continue;
+                    }
+
+        }
+        

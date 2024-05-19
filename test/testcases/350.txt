@@ -1,0 +1,11 @@
+main:function void() {
+            n: integer;
+            readInteger(n);
+            for ( k = 0, k <= n, k+1) {
+                tuso = 2 * (k + 1);
+                mau1 = 1 + 2 * k;
+                mau2 = 3 + 2 * k;
+                nhantu = tuso * tuso / (mau1*mau2);
+                sum = sum * nhantu;
+            }
+        }

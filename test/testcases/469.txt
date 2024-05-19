@@ -1,0 +1,11 @@
+
+        mom: function void(out a: auto, inherit b: integer, c: auto) {}
+        
+        child: function void(a: string) inherit mom {
+            super(a,b,b);
+        }
+        
+        main: function void() {
+            mom(1,2,1);
+        }
+        
