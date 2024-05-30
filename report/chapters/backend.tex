@@ -1,0 +1,47 @@
+\section{Backend Design}
+We use the Visitor design pattern for phases and sub-phases in the backend, as shown in Listing \ref{listing:visitor-pattern}. Possible visitees are AST and CFG. Information is passed through visitors through a \texttt{VisitData} object. A visitor function takes the data from its caller and returns an \textit{updated data}. This strategy is to ensure purity and to let us visit a visitee just by visiting its children and do later work one-by-one. Python uses pass-by-reference mechanism for a user-defined class, so our implementation does not impact on memory usage. In practice, it is sufficient to encapsulate an object and a context in the data. For each visitor, we have to explicate the visit context. The backend design is illustrated in Figure \ref{figure:backend-design}
+
+\begin{lstlisting}[language = python, caption={Visitor pattern}, label={listing:visitor-pattern}]
+class VisitData:
+    def __init__(self, 
+                obj, # the object of data structure needed to be visited
+                ctx, # context needed for a visit function to return the complete updated data
+                ):
+        # Initialization
+
+class Visitee:
+    def accept(self, visitor, visit_data):
+        method_name = "visit{}".format(self.__class__.__name__)
+        visit_function = getattr(visitor, method_name)
+        return visit_function(self, data)
+
+class ExampleVisitee(Visitee): pass
+
+class Visitor:
+    def visit(self, visitee, visit_data):
+        return visitee.accept(self, data)
+    
+    def visitExampleVisitee(self, visitee, visit_data):
+        '''
+        Instructions...
+        '''
+        return updated_visit_data
+\end{lstlisting}
+
+\begin{figure}
+    \centering
+    \includegraphics[width = 0.5\textwidth]{img/backend-design}
+    \caption{Backend design}
+    \label{figure:backend-design}
+\end{figure}
+
+\input{chapters/sections/AST-refactor}
+\input{chapters/sections/CFG-building}
+\input{chapters/sections/CFG-refactor}
+\input{chapters/sections/local-optimization}
+\input{chapters/sections/liveliness-generation}
+\input{chapters/sections/register-allocation}
+\input{chapters/sections/code-generation}
+
+
+

@@ -1,0 +1,39 @@
+// Control Flow Graph
+digraph {
+	0 [label="0_0" labeljust=l labelloc=t shape=rect]
+	0 -> 1 [label=next]
+	1 [label="0_main_1
+AssignStmt(a, ArrayLit[IntegerLit(5), IntegerLit(4), IntegerLit(3), IntegerLit(2), IntegerLit(1)])
+VarDecl(tmp, IntegerType)
+AssignStmt(i, FloatLit(0.0))
+BinExpr(<, i, IntegerLit(4))" labeljust=l labelloc=t shape=rect]
+	1 -> 2 [label=true]
+	1 -> 4 [label=false]
+	3 [label="cond_3
+BinExpr(<, i, IntegerLit(4))" labeljust=l labelloc=t shape=rect]
+	3 -> 2 [label=true]
+	3 -> 4 [label=false]
+	2 [label="loop_2
+AssignStmt(j, BinExpr(+, i, IntegerLit(1)))
+BinExpr(<, j, IntegerLit(5))" labeljust=l labelloc=t shape=rect]
+	2 -> 5 [label=true]
+	2 -> 7 [label=false]
+	4 [label=endloop_4 labeljust=l labelloc=t shape=rect]
+	6 [label="cond_6
+BinExpr(<, j, IntegerLit(5))" labeljust=l labelloc=t shape=rect]
+	6 -> 5 [label=true]
+	6 -> 7 [label=false]
+	5 [label="loop_5
+BinExpr(>, ArrayCell(a, [i]), ArrayCell(a, [j]))" labeljust=l labelloc=t shape=rect]
+	5 -> 9 [label=true]
+	7 [label=endloop_7 labeljust=l labelloc=t shape=rect]
+	8 [label="end_if_8
+AssignStmt(ArrayCell(a, [i]), ArrayCell(a, [j]))
+AssignStmt(ArrayCell(a, [j]), tmp)
+AssignStmt(j, BinExpr(+, j, IntegerLit(1)))
+AssignStmt(i, BinExpr(+, i, IntegerLit(1)))" labeljust=l labelloc=t shape=rect]
+	8 -> 3 [label=next]
+	9 [label="true_branch_9
+AssignStmt(tmp, ArrayCell(a, [i]))" labeljust=l labelloc=t shape=rect]
+	9 -> 8 [label=next]
+}

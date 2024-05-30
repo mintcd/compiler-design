@@ -1,0 +1,141 @@
+\documentclass[a4paper]{report}
+
+\input{packages}
+\usepackage{styles}
+\usepackage{commands}
+
+
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=black,citecolor=black}
+% \captionsetup[table]{name=Table}
+\makeindex[columns=3, title=Index, intoc]
+
+\def\thesislayout{
+	\geometry{
+		a4paper,
+		total={160mm,240mm}, 
+		left=30mm,
+		top=30mm,
+	}
+}
+\thesislayout
+
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+
+\fancyhead[L]{}
+\fancyhead[R]{\nouppercase{\textbf{\rightmark}}}
+
+\renewcommand{\headrulewidth}{0.3pt}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\makeatletter
+% \newcounter {subsubsubsection}[subsubsection]
+% \renewcommand\thesubsubsubsection{\thesubsubsection .\@alph\c@subsubsubsection}
+% \newcommand\subsubsubsection{\@startsection{subsubsubsection}{4}{\z@}%
+%                                      {-3.25ex\@plus -1ex \@minus -.2ex}%
+%                                      {1.5ex \@plus .2ex}%
+%                                      {\normalfont\normalsize\bfseries}}
+% \newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
+% \newcommand*{\subsubsubsectionmark}[1]{}
+% \makeatother
+
+\everymath{\color{blue}}%make in-line maths symbols blue to read/check easily
+
+\sloppy
+
+
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\thesislayout
+
+
+%%%%%%%% LSTLISTING SETUP %%%%%%%%
+\lstset{frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color[HTML]{228B22},
+  stringstyle=\color[HTML]{228B22},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  backgroundcolor=\color[HTML]{F5F5F5}
+}
+
+\everymath{\color{black}}
+\newcommand{\marking}[2]{$\color{blue}M_{#1} = [#2]$}
+
+\thesislayout
+\addbibresource{refs.bib}
+
+\author{}
+\title{Capstone Project}
+\date{}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{tikzpicture}[remember picture, overlay]
+    \draw[line width = 4pt] ($(current page.north west) + (2.5cm,-2cm)$) rectangle ($(current page.south east) + (-1.5cm,2cm)$);
+  \end{tikzpicture}
+  \begin{center}
+    VIETNAM NATIONAL UNIVERSITY, HO CHI MINH CITY\\
+    UNIVERSITY OF TECHNOLOGY\\
+    FACULTY OF COMPUTER SCIENCE AND ENGINEERING
+  \end{center}
+
+  \vspace{1cm}
+
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{hcmut.png}
+  \end{figure}
+
+  \vspace{1cm}
+
+  \begin{center}
+    \begin{tabular}{c}
+      \multicolumn{1}{c}{\textbf{{\Large \color{blue} PRINCIPLES OF PROGRAMMING LANGUAGES}}} \\ \\
+      ~~                                                                                     \\
+      \hline
+      \\
+
+      \textcolor{black}{\textbf{{\large INTERMEDIATE REPRESENTATION OPTIMIZATION AND}}}      \\\\
+      \textcolor{black}{\textbf{{\large MIPS CODE GENERATION}}}                              \\
+      ~~                                                                                     \\
+      \hline
+      \\
+    \end{tabular}
+  \end{center}
+
+  \begin{table}[h]
+    \begin{tabular}{rrll}
+
+      \hspace{5 cm}
+       & Instructor: & Dr. Nguyen Duc Dung      \\
+       &             &                          \\
+       & Student:    & Chau Dang Minh - 2013748 \\
+    \end{tabular}
+  \end{table}
+  \vspace{2cm}
+  \begin{center}
+    {\footnotesize Ho Chi Minh City, May 2024}
+  \end{center}
+\end{titlepage}
+\tableofcontents
+\newpage
+\input{chapters/improvement}
+\input{chapters/revision}
+\input{chapters/backend}
+\section{Testing}
+Command line testing with manual match has been provided in README file in the project \href{https://github.com/mintcd/compiler-design.git}{repository}.
+
+\printbibliography
+\end{document}

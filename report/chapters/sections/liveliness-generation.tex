@@ -1,0 +1,43 @@
+\subsection{Liveliness Generation}
+Liveliness is a determination of usage of the symbols. A symbol $x$ is live at statement $s$ if
+\begin{enumerate}
+  \item There exists a statement $s'$ that uses $s$.
+  \item There is a path from $s$ to $s'$ in the CFG.
+  \item From $s$ to $s'$, there is no re-assignment of $x$.
+\end{enumerate}
+We compute liveliness by passing live information through adjacent statements through a function
+$$L(s,x, \text{in | out}).$$
+This function determines whether a symbol $x$ is live incoming or outcoming of a statement $s$. We follow these rules:
+\begin{enumerate}
+  \item If a condition $C$ uses $x$, then $x$ is live incoming this assignment.
+        \begin{equation}
+          L(C(x), x, \mathrm{in}) = \mathrm{True}.
+        \end{equation}
+  \item If an assignment uses $x$ on the right-hand side, then $x$ is live incoming this assignment.
+        \begin{equation}
+          L(\ldots := \mathrm{LHS}(x), x, \mathrm{in}) = \mathrm{True}.
+        \end{equation}
+  \item If an assignment refers to $x$ on the left-hand side but not the right-hand side, then $x$ is not live incoming this assignment
+        \begin{equation}
+          L(x := e, x, \mathrm{in}) = \mathrm{False}.
+        \end{equation}
+  \item If a statement does not refer to $x$, then the liveliness of $x$ does not change when outcoming the statement.
+        \begin{equation}
+          L(s, x, \mathrm{in}) = L(s, x, \mathrm{out})
+        \end{equation}
+  \item If $x$ is live incoming a statement $s'$, then $x$ is live outcoming predecessors of $s'$.
+        \begin{equation}
+          L(s, x, \mathrm{out}) = \bigvee \left\{ L(s',x,\mathrm{in}) : s' \text{ is a successor of }  s\right\}.
+        \end{equation}
+\end{enumerate}
+
+The first three rules are run once. After that, the last two rules are run iteratively until no changes appear on the liveliness dictionary. After that, live symbols at each statement \texttt{stmt} is computed as all live symbols outcoming of this statement and incoming of its successor. In implementation, we remove all \texttt{VarDecl} as the declaration of a symbol when it is used has been checked.
+
+\begin{lstlisting}[language = python, caption={Liveliness generator context}, label={listing:live-gen-context}]
+  class LiveGenContext:
+    def __init__(self, 
+                  stmt,            # current visited statement
+                  refered_symbols  # current refered symbols
+                ):
+    # Initialization
+\end{lstlisting}

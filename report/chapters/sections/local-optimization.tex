@@ -1,0 +1,10 @@
+\subsection{CFG Local Optimization}
+Local Optimizer includes
+\begin{itemize}
+  \item Algebraic Simplification: whenever there is \texttt{Expr} of all literals, compute beforehand if possible.
+  \item Copy Propagation: whenever there is \texttt{AssignStmt(Id(x), Id(y))}, replace all future usages of \texttt{x} by \texttt{y} until the next assignment of \texttt{x}.
+  \item Constant Folding: whenever there is \texttt{AssignStmt(Id(x), literal)}, replace all future usages of \texttt{x} by \texttt{y} until the next assignment of \texttt{x}.
+  \item Dead Code Elimination: \texttt{AssignStmt(Id(x), Id(y))} and \texttt{x} does not appear elsewhere in the block, delete this statement.
+\end{itemize}
+
+Each component is implemented as a CFG Visitor, which returns an updated CFG. The components are run iteratively until no changes appear.

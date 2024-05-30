@@ -1,0 +1,20 @@
+\subsection{AST Refactor}
+
+AST refactor modifies the AST in preparation for later processes. Since, variable declaration before using has been checked in frontend, so we only need statements that use these variables, recorded their data types. To sum up, the Refactorer helps us:
+
+\begin{itemize}
+  \item Eliminate dead code after ReturnStmt in FuncDecl.
+  \item Turn Stmt used in IfStmt, WhileStmt, ForStmt and DoWhileStmt to BlockStmt
+  \item Remove VarDecl(name, type, value), while add the name into the symbol table.
+  \item Turn VarDecl(name, type, value) to AssignStmt(Id(name), value, referenced\_type), while add the name into the symbol table.
+  \item Turn ForStmt to WhileStmt.
+  \item Unwrap complex BinExpr.
+\end{itemize}
+
+\begin{lstlisting}[language=Python]
+class ASTRefactorContext:
+  def __init__(self,
+              in_func : str or None, # The name of the function that the visited statement belongs to
+              st : SymbolTable,      # The symbol table
+              )
+\end{lstlisting}

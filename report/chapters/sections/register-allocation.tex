@@ -1,0 +1,26 @@
+\subsection{Register Allocation}
+Up to now, we have live symbols at every statement. Two symbols cannot be allocated to the same register if they are live at the same time. Hence, we construct a Register Inference Graph (RIG). Each symbol is represented by a node. There is an edge between two nodes if they are live simultaneously at some point in the program. Since register allocation is NP hard, we follow a heuristic approach. Generally, we try to allocate register to node whose degree is less than or equal to the number of register, then remove this node from RIG, and so on. If such node is not found, we spill the highest-degree node i.e. load and store continuously for respective symbol.
+
+\begin{algorithm}
+  \caption{Heuristic Register Allocation}
+  \begin{algorithmic}
+    \STATE $r$ : number of registers
+    \STATE $G$ : register inference graph
+    \STATE $S$ : empty stack
+
+    \WHILE{$\text{rig.nodes is not empty}$}
+    \STATE lst := nodes of degree less than or equal to $r$
+    \IF{lst is empty}
+    \STATE Spill the highest-degree node $N$
+    \STATE Remove $N$ from $G$
+    \ELSE
+    \STATE Add highest-degree node $N$ in lst to $S$
+    \STATE Remove $N$ from $G$
+    \ENDIF
+    \ENDWHILE
+
+    \WHILE{$S$ is not empty}
+    \STATE choose appropriate register for $N$
+    \ENDWHILE
+  \end{algorithmic}
+\end{algorithm}

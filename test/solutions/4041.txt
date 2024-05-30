@@ -1,1 +1,4 @@
-Illegal array literal: ArrayLit([ArrayLit([IntegerLit(1), IntegerLit(2), ArrayLit([IntegerLit(7)])]), ArrayLit([IntegerLit(1), IntegerLit(2), IntegerLit(3)])])
+Program([
+	FuncDecl(Ha, ArrayType([2, 3], IntegerType), [], None, BlockStmt([[<utils.structures.AST.VarDecl object at 0x00000214A0CDE050>], ReturnStmt(Id(a))]))
+	FuncDecl(main, void, [], None, BlockStmt([]))
+])
