@@ -30,7 +30,6 @@ class VarSym(Symbol):
         super().__init__(id, name, typ, scope)
         self.value = value
 
-
 class SymbolTable:
     def __init__(self, symbols: List[Symbol] or None = None, 
                 ):
@@ -39,16 +38,16 @@ class SymbolTable:
         self.avail_id = 0
         
         # Adding predefined symbols
-        self.symbols += [
-            FuncSym(self.get_avail_id(), "readInteger", VoidType(), params=[IntegerType()]),
-            FuncSym(self.get_avail_id(), "printInteger", VoidType()),
-            FuncSym(self.get_avail_id(), "readFloat", VoidType(), params=[FloatType()]),
-            FuncSym(self.get_avail_id(), "writeFloat", VoidType()),
-            FuncSym(self.get_avail_id(), "readBoolean", VoidType(), params=[BooleanType()]),
-            FuncSym(self.get_avail_id(), "printBoolean", VoidType()),
-            FuncSym(self.get_avail_id(), "readString", VoidType(), params=[StringType()]),
-            FuncSym(self.get_avail_id(), "printString", VoidType())
-        ]
+        # self.symbols += [
+        #     FuncSym(self.get_avail_id(), "readInteger", VoidType(), params=[IntegerType()]),
+        #     FuncSym(self.get_avail_id(), "printInteger", VoidType()),
+        #     FuncSym(self.get_avail_id(), "readFloat", VoidType(), params=[FloatType()]),
+        #     FuncSym(self.get_avail_id(), "writeFloat", VoidType()),
+        #     FuncSym(self.get_avail_id(), "readBoolean", VoidType(), params=[BooleanType()]),
+        #     FuncSym(self.get_avail_id(), "printBoolean", VoidType()),
+        #     FuncSym(self.get_avail_id(), "readString", VoidType(), params=[StringType()]),
+        #     FuncSym(self.get_avail_id(), "printString", VoidType())
+        # ]
     
     def __str__(self):
         return ",\n".join(str(symbol) for symbol in self.symbols)

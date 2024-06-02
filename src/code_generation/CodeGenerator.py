@@ -25,11 +25,10 @@ class CodeGenerator(CFGVisitor):
   def __init__(self, ast : AST, num_reg : int):
 
     self.ast = ASTRefactorer(ast).refactor()
-    print(28, self.ast)
     self.cfg = CFGBuilder(self.ast).build()
-    print(30, self.cfg)
     self.st = SymbolTableBuilder(self.ast).build()
-    # print(self.st)
+
+    print(31, self.cfg)
 
     self.reg_alloc = RegisterAllocator(self.cfg, num_reg).allocate()
     

@@ -5,6 +5,7 @@ from utils.structures.RIG import RIG
 class RegisterAllocator:
     def __init__(self, cfg, num_reg: int):
         live = LivelinessGenerator(cfg).generate()
+        print(8, live)
 
         self.num_reg = num_reg
         

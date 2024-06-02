@@ -1,7 +1,7 @@
 from utils.structures.CFG import *
-from utils.visitor_pattern import VisitData
+from utils.visitor_pattern import Data
 from utils.visitors import CFGVisitor
-from utils.structures.AST import *
+# from utils.structures.AST import
 import json
 from typing import Set
 import copy
@@ -11,7 +11,7 @@ class LiveGenContext:
                     refered_syms: Set[str] or None = None):
     self.refered_syms = refered_syms if refered_syms is not None else set()
 
-class LiveGenData(VisitData):
+class LiveGenData(Data):
   def __init__(self, obj : dict(), ctx : LiveGenContext):
     self.obj = obj
     self.ctx = ctx
@@ -33,8 +33,10 @@ class LivelinessGenerator(CFGVisitor):
     # If this is the last stmt in the block, look for first stmts in succ blocks   
     if isinstance(stmt_block, CondBlock) or stmt.id[1] == len(stmt_block.stmts) - 1:
       for succ_block in stmt_block.get_successors():
-        if len(succ_block.stmts) > 0:
+        if isinstance(succ_block, StmtBlock) and len(succ_block.stmts) > 0:
           succs.append(succ_block.stmts[0])
+        if isinstance(succ_block, CondBlock):
+          succs.append(succ_block.cond)
     # Else add its succ stmt in the same block
     else:
       succs.append(stmt_block.stmts[stmt.id[1] + 1])
@@ -343,6 +345,7 @@ class Rule5(CFGVisitor):
   
   def visitCondBlock(self, cfg : CondBlock, data : LiveGenData):
     next_stmts = self.cfg.get_next_stmts(cfg.cond)
+
     if len(succ_stmts) == 0: 
       return data
     else:

@@ -1,4 +1,4 @@
-from utils.visitor_pattern import Visitor, VisitData
+from utils.visitor_pattern import Visitor, Data
 from utils.structures.CFG import *
 from utils.structures.AST import *
 
@@ -7,107 +7,106 @@ class ASTVisitor(Visitor):
     def __init__(self, ast):
         self.ast = ast
 
-    def visitFloatType(self, ast : FloatType, data : VisitData): 
+    def visitFloatType(self, ast : FloatType, data : Data): 
         return data
     
-    def visitIntegerType(self, ast : IntegerType, data : VisitData): 
+    def visitIntegerType(self, ast : IntegerType, data : Data): 
         return data
  
-    def visitBooleanType(self, ast, data : VisitData): 
+    def visitBooleanType(self, ast, data : Data): 
         return data
  
-    def visitStringType(self, ast, data : VisitData): 
+    def visitStringType(self, ast, data : Data): 
         return data
  
-    def visitArrayType(self, ast, data : VisitData):
+    def visitArrayType(self, ast, data : Data):
         return data
  
-    def visitAutoType(self, ast, data : VisitData):
+    def visitAutoType(self, ast, data : Data):
         return data
 
-    def visitVoidType(self, ast, data : VisitData):
+    def visitVoidType(self, ast, data : Data):
         return data
  
-    def visitBinExpr(self, ast, data : VisitData):
+    def visitBinExpr(self, ast, data : Data):
         return data
  
-    def visitUnExpr(self, ast, data : VisitData):
+    def visitUnExpr(self, ast, data : Data):
         return data
   
-    def visitId(self, ast, data : VisitData):
+    def visitId(self, ast, data : Data):
         return data
    
-    def visitArrayCell(self, ast, data : VisitData):
+    def visitArrayCell(self, ast, data : Data):
         return data
 
-    def visitIntegerLit(self, ast, data : VisitData):
+    def visitIntegerLit(self, ast, data : Data):
         return data
 
-    def visitFloatLit(self, ast, data : VisitData):
+    def visitFloatLit(self, ast, data : Data):
         return data
     
-    def visitStringLit(self, ast, data : VisitData):
+    def visitStringLit(self, ast, data : Data):
         return data
 
-    def visitBooleanLit(self, ast, data : VisitData):
+    def visitBooleanLit(self, ast, data : Data):
         return data
 
-    def visitArrayLit(self, ast, data : VisitData):
+    def visitArrayLit(self, ast, data : Data):
         return data
 
-    def visitFuncCall(self, ast, data : VisitData):
+    def visitFuncCall(self, ast, data : Data):
         return data
 
-    def visitAssignStmt(self, ast : AssignStmt, data : VisitData): 
-        return data
- 
-    def visitASTBlock(self, ast : Block, data : VisitData): 
+    def visitAssignStmt(self, ast : AssignStmt, data : Data): 
         return data
 
-    def visitIfStmt(self, ast, data : VisitData):
+    def visitIfStmt(self, ast, data : Data):
         return data
 
-    def visitForStmt(self, ast, data : VisitData):
+    def visitForStmt(self, ast, data : Data):
         return data
 
     
-    def visitWhileStmt(self, ast, data : VisitData):
+    def visitWhileStmt(self, ast, data : Data):
         return data
 
     
-    def visitDoWhileStmt(self, ast, data : VisitData):
+    def visitDoWhileStmt(self, ast, data : Data):
         return data
 
     
-    def visitBreakStmt(self, ast, data : VisitData):
+    def visitBreakStmt(self, ast, data : Data):
         return data
 
     
-    def visitContinueStmt(self, ast, data : VisitData):
+    def visitContinueStmt(self, ast, data : Data):
         return data
 
     
-    def visitReturnStmt(self, ast, data : VisitData):
+    def visitReturnStmt(self, ast, data : Data):
         return data
 
     
-    def visitCallStmt(self, ast, data : VisitData):
+    def visitCallStmt(self, ast, data : Data):
         return data
 
     
-    def visitVarDecl(self, ast, data : VisitData):
+    def visitVarDecl(self, ast, data : Data):
         return data
 
     
-    def visitParamDecl(self, ast, data : VisitData):
+    def visitParamDecl(self, ast, data : Data):
+        return data
+
+    def visitStmtBlock(self, ast : Block, data : Data): 
+        return data
+    
+    def visitFuncDecl(self, ast, data : Data):
         return data
 
     
-    def visitFuncDecl(self, ast, data : VisitData):
-        return data
-
-    
-    def visitProgram(self, ast, data : VisitData):
+    def visitProgram(self, ast, data : Data):
         return data
 
 class CFGVisitor(Visitor):

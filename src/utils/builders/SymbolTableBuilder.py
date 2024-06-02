@@ -1,4 +1,4 @@
-from utils.visitor_pattern import VisitData
+from utils.visitor_pattern import Data
 from utils.visitors import ASTVisitor
 from utils.structures.SymbolTable import *
 
@@ -13,7 +13,7 @@ class SymbolTableBuilderContext:
     self.current_datatype = None
     self.args = args
 
-class SymbolTableBuilderData(VisitData):
+class SymbolTableBuilderData(Data):
   def __init__(self, obj : SymbolTable or None = None, 
                     ctx : SymbolTableBuilderContext or None  = None):
     self.obj = SymbolTable() if obj is None else obj
@@ -68,7 +68,7 @@ class SymbolTableBuilder(ASTVisitor):
 
       return data
 
-  def visitASTBlock(self, ast : StmtBlock, data):
+  def visitStmtBlock(self, ast : StmtBlock, data):
     for stmt in ast.stmts:
       data = self.visit(stmt, data)
     return data

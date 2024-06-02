@@ -1,7 +1,7 @@
 from utils.visitor_pattern import Visitee
 from typing import List
 from graphviz import Digraph
-from utils.structures.AST import *
+from utils.structures.AST import AssignStmt, Expr
 
 class Block(Visitee):
     def __init__(self, id, name = None,
@@ -39,7 +39,7 @@ class StmtBlock(Block):
 
     def __repr__(self):
         printNext = f"{self.next.name}_{self.next.id}" if self.next is not None else None
-        indented_stmts = "[\n\t" + "\n\t".join((str(stmt.id) + ": " + str(stmt)) for stmt in self.stmts) + "\n]" if len(self.stmts) > 0 else "[]"
+        indented_stmts = "[\n\t" + "\n\t".join((str(stmt)) for stmt in self.stmts) + "\n]" if len(self.stmts) > 0 else "[]"
 
         return (f"Block(id: {self.id}, "
                 f"name: {self.name}, "
@@ -114,21 +114,21 @@ class CFG(Visitee):
         for block in self.blocks:
             # Construct the label in multiple steps for better readability
             block_label = f"{block.name}_{block.id}"
-            if block.stmts:
+            if isinstance(block, StmtBlock):
                 block_label += "\n" + "\n".join(str(stmt) for stmt in block.stmts)
-            if block.cond:
+                # Add edges for next, true, and false connections
+                if block.next:
+                    dot.edge(str(block.id), str(block.next.id), label="next")
+            else:
                 block_label += "\n" + str(block.cond)
+                if block.true:
+                    dot.edge(str(block.id), str(block.true.id), label="true")
+                if block.false:
+                    dot.edge(str(block.id), str(block.false.id), label="false")
             
             # Add the node with the constructed label
             dot.node(str(block.id), block_label, shape='rect', labeljust='l', labelloc='t')            
-            # Add edges for next, true, and false connections
-            if block.next:
-                dot.edge(str(block.id), str(block.next.id), label="next")
-            if block.true:
-                dot.edge(str(block.id), str(block.true.id), label="true")
-            if block.false:
-                dot.edge(str(block.id), str(block.false.id), label="false")
-        
+
         return dot
 
     def get_block_precessors(self, block : Block):

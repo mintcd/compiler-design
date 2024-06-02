@@ -1,7 +1,6 @@
 from utils.structures.AST import *
 from utils.visitors import ASTVisitor
 from utils.structures.CFG import *
-from utils.visitor_pattern import VisitData
 
 
 class CFGContext:
@@ -30,6 +29,11 @@ class CFGBuilder(ASTVisitor):
 
         # Visit
         cfg = self.visit(self.ast, data).obj
+
+        # Remove all VarDecl since ST has been build
+        for block in cfg.blocks:
+            if isinstance(block, StmtBlock):
+                block.stmts = [stmt for stmt in block.stmts if not isinstance(stmt, VarDecl)]    
 
         # Assign a unique ID to each statement
         for block in cfg.blocks:
@@ -84,7 +88,7 @@ class CFGBuilder(ASTVisitor):
         data.ctx.active_block.stmts.append(ast)
         return data
 
-    def visitASTBlock(self, ast : Block, data : CFGData):
+    def visitStmtBlock(self, ast : Block, data : CFGData):
         for stmt in ast.stmts:
             data = self.visit(stmt, data)
 
@@ -133,6 +137,8 @@ class CFGBuilder(ASTVisitor):
         last_true_active_block.next = end_block
         if last_false_active_block is not None: 
             last_false_active_block.next = end_block
+        else: 
+            cond_block.false = end_block
 
         ctx.active_block = end_block
 

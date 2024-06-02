@@ -3,7 +3,7 @@ from typing import List, Tuple
 
 class AST(Visitee): pass
 
-# Statment container
+# Statement container
 class StmtBlock(AST):
     def __init__(self, stmts):
         self.stmts = stmts
@@ -23,12 +23,12 @@ class StmtBlock(AST):
         return self
 
 class Stmt(AST): 
-    def __init__(self, _id = None, block: StmtBlock or None = None):
+    def __init__(self, _id: Tuple[int] or None = None, block: StmtBlock or None = None):
         self.id = _id if _id is not None else None
         self.block = block if block is not None else None
 class Expr(AST): 
-    def __int__(self,  _id = None):
-        self.id = _id
+    def __init__(self, stmt: Stmt or None = None):
+        self.stmt = stmt
 class Type(AST): pass
 class Decl(AST): pass
 
@@ -41,48 +41,11 @@ class Program(AST):
 
 class AtomicLiteral(Expr): pass
 
-################### Types ##########################
-class AtomicType(Type): 
-    def __repr__(self):
-        return self.__class__.__name__
-
-class IntegerType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
-
-class FloatType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
-
-class BooleanType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
-
-class StringType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
-
-class ArrayType(Type):
-    def __init__(self, dimensions: List[int], typ: AtomicType):
-        self.dimensions = dimensions
-        self.typ = typ
-
-    def __repr__(self):
-        return "ArrayType([{}], {})".format(", ".join([str(dimen) for dimen in self.dimensions]), str(self.typ))
-
-class AutoType(Type):
-    def __repr__(self):
-        return self.__class__.__name__
-
-class VoidType(Type):
-    def __repr__(self):
-        return self.__class__.__name__
-
-
 ########################### Expressions #############################
 
 class BinExpr(Expr):
     def __init__(self, op: str, left: Expr, right: Expr):
+        super().__init__()
         self.op = op
         self.left = left
         self.right = right
@@ -122,6 +85,7 @@ class BinExpr(Expr):
 
 class UnExpr(Expr):
     def __init__(self, op: str, val: Expr):
+        super().__init__()
         self.op = op
         self.val = val
 
@@ -136,16 +100,30 @@ class UnExpr(Expr):
 
 class Id(Expr):
     def __init__(self, name: str):
+        super().__init__()
         self.name = name
     def __repr__(self):
         return f"Id({self.name})"
 
 class ArrayCell(Expr):
     def __init__(self, name: str, cell: List[Expr]):
+        super().__init__()
         self.name = name
         self.cell = cell
     def __repr__(self):
         return "ArrayCell({}, [{}])".format(self.name, ", ".join([str(expr) for expr in self.cell]))
+
+class FuncCall(Expr):
+    def __init__(self, name: str, args: List[Expr]):
+        super().__init__()
+        self.name = name
+        self.args = args
+
+class ArrayLit(Expr):
+    def __init__(self, explist: List[Expr]):
+        self.explist = explist
+    def __repr__(self):
+        return f"[{', '.join(str(expr) for expr in self.explist)}]"
 
 class IntegerLit(AtomicLiteral):
     def __init__(self, val: int):
@@ -167,16 +145,6 @@ class BooleanLit(AtomicLiteral):
     def __init__(self, val: bool):
         self.val = val
 
-class ArrayLit(Expr):
-    def __init__(self, explist: List[Expr]):
-        self.explist = explist
-    def __repr__(self):
-        return f"[{', '.join(str(expr) for expr in self.explist)}]"
-
-class FuncCall(Expr):
-    def __init__(self, name: str, args: List[Expr]):
-        self.name = name
-        self.args = args
 
 ############################### Statements ##################################
 
@@ -289,3 +257,41 @@ class FuncDecl(Decl):
 
     def __repr__(self):
         return "FuncDecl({}, {}, [{}], {}, {})".format(self.name, str(self.rtype), ", ".join([str(param) for param in self.params]), self.inherit if self.inherit else "None", str(self.body))
+
+
+################### Types ##########################
+class AtomicType(Type): 
+    def __repr__(self):
+        return self.__class__.__name__
+
+class IntegerType(AtomicType): 
+    def __repr__(self):
+        return self.__class__.__name__
+
+class FloatType(AtomicType): 
+    def __repr__(self):
+        return self.__class__.__name__
+
+class BooleanType(AtomicType): 
+    def __repr__(self):
+        return self.__class__.__name__
+
+class StringType(AtomicType): 
+    def __repr__(self):
+        return self.__class__.__name__
+
+class ArrayType(Type):
+    def __init__(self, dimensions: List[int], typ: AtomicType):
+        self.dimensions = dimensions
+        self.typ = typ
+
+    def __repr__(self):
+        return "ArrayType([{}], {})".format(", ".join([str(dimen) for dimen in self.dimensions]), str(self.typ))
+
+class AutoType(Type):
+    def __repr__(self):
+        return self.__class__.__name__
+
+class VoidType(Type):
+    def __repr__(self):
+        return self.__class__.__name__

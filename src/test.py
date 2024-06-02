@@ -9,16 +9,20 @@ from code_generation.CodeGenerator import CodeGenerator
 
 import json
 
-data = '''main : function void() {
+data = '''
+main : function void() {
   a,b,c,d,e : integer = 1,2,3,4,5;
   if (a > b) {
-    a = b;
+    c : integer;
+    c = a;
   }
 }'''
 
 ast = parse(data)
 
-print(ast)
+# st = SymbolTableBuilder(ast).build()
+
+# print(23, st)
 
 code = CodeGenerator(ast, 4).generate()
 
