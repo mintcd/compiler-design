@@ -184,16 +184,25 @@ class Parser:
             ifstmt : IF LP expr RP stmt 
                     | IF LP expr RP stmt elsestmt
         '''
+        if not isinstance(p[5], StmtBlock):
+            p[5] = StmtBlock([p[5]])
         if len(p) == 6:
             p[0] = IfStmt(p[3], p[5])
-        else : p[0] = IfStmt(p[3], p[5], p[6])
+        else : 
+            p[0] = IfStmt(p[3], p[5], p[6])
     
     def p_elsestmt(self, p):
         '''elsestmt : ELSE stmt '''
+        if not isinstance(p[2], StmtBlock):
+            p[2] = StmtBlock([p[2]])
+
         p[0] = p[2]
     
     def p_forstmt(self, p):
         '''forstmt : FOR LP lhs ASSIGN expr CM expr CM expr RP stmt'''
+        if not isinstance(p[11], StmtBlock):
+            p[11] = StmtBlock([p[11]])
+
         p[0] = ForStmt(
             AssignStmt(p[3], p[5]),
             p[7],
@@ -203,15 +212,21 @@ class Parser:
 
     def p_whilestmt(self, p):
         '''whilestmt : WHILE LP expr RP stmt'''
+        if not isinstance(p[5], StmtBlock):
+            p[5] = StmtBlock([p[5]])
+
         p[0] = WhileStmt(p[3], p[5])
     
-    def p_dowhilestmt(self, p):
+    def p_dowhilestmt(self, p):            
         '''dowhilestmt : DO blockstmt WHILE LP expr RP SM'''
+        if not isinstance(p[2], StmtBlock):
+            p[2] = StmtBlock([p[2]])
+
         p[0] = DoWhileStmt(p[5], p[2])
 
     def p_blockstmt(self, p):
         '''blockstmt : LB stmtlist RB'''
-        p[0] = BlockStmt(p[2])
+        p[0] = StmtBlock(p[2])
     
     def p_callstmt(self, p):
         '''callstmt : ID LP exprlist RP SM'''
@@ -348,8 +363,6 @@ class Parser:
         else:
             p[0] = Id(p[1])
             
-
-
 ###############################################
     def p_error(self, p):
         print(f"Syntax error in input {p}")

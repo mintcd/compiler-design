@@ -1,8 +1,5 @@
-
-
-''''''
-
-'''main : function void() {
+// Insertion sorts
+main : function void() {
   a : array[5] of integer = {5,4,3,2,1};
   tmp : integer;
   for (i = 0, i < 4, i + 1){
@@ -13,4 +10,4 @@
         a[j] = tmp;
     }
   }
-}'''
+}

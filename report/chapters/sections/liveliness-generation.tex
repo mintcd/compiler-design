@@ -31,7 +31,7 @@ This function determines whether a symbol $x$ is live incoming or outcoming of a
         \end{equation}
 \end{enumerate}
 
-The first three rules are run once. After that, the last two rules are run iteratively until no changes appear on the liveliness dictionary. After that, live symbols at each statement \texttt{stmt} is computed as all live symbols outcoming of this statement and incoming of its successor. In implementation, we remove all \texttt{VarDecl} as the declaration of a symbol when it is used has been checked.
+The first three rules are run once. Then the last two rules are run iteratively until no changes appear on the liveliness dictionary. Live symbols at each statement \texttt{stmt} is computed as all live symbols outcoming of this statement and incoming of its successor.
 
 \begin{lstlisting}[language = python, caption={Liveliness generator context}, label={listing:live-gen-context}]
   class LiveGenContext:

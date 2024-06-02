@@ -1,95 +1,120 @@
-from typing import List
-from utils.structures.AST import *
+class ASTRefactorer5(ASTVisitor):
+    '''
+      Unwrap Binexpr
+    '''
+    def __init__(self, ast):
+        self.ast = ast
 
-class Symbol:
-    def __init__(self,  id : int,
-                        name: string, 
-                        datatype: Type, 
-                        scope: string or 0,
-                        declared_line: int):
-        '''
-        The scope of a symbol is its parent function or 0 if global.
-        When there is a FuncCall or CallStmt, a new scope is created.
-        '''
-        self.name = name
-        self.datatype = datatype
-        self.scope = scope
-        self.declared_stmt = declared_line
-        self.called_lines = List[int]
-
-    def __str__(self):
-        return "Symbol({}, {})".format(self.name, self.typ, self.scope)
-
-class VarSym(Symbol):
-    def __init__(self, name, datatype, scope, declared_line, 
-                value = None, assigned_lines = None):
-        super().__init__(name, datatype, scope, declared_line)
-        self.value = value
-        self.assigned_lines = assigned_lines if assigned_lines is not None else []
-
-
-class FuncSym(Symbol):
-    def __init__(self, name, datatype, scope, declared_line, 
-                params : List[Type] or None = None):
-        
-        super().__init__(name, datatype, scope, declared_line, called_lines)
-        self.params = params if params is not None else []
-
-
-class Context:
-    def __init__(self, scope = 0, line_in_scope = 0, in_loop = False, current_datatype = None):
-        self.scope = scope
-        self.line_in_scope = line_in_scope
-        self.in_loop = in_loop
-        self.current_datatype = None
-
-class SymbolTable:
-    def __init__(self, symbols: List[Symbol] or None = None, 
-                        context: Context or None = None):
-
-        self.symbols = symbols if symbols is not None else []
-        
-        # Adding predefined symbols
-        self.symbols += [
-            FuncSym("readInteger", VoidType(), 0, 0, [IntegerType()]),
-            FuncSym("printInteger", VoidType(), 0, 0),
-            FuncSym("readFloat", VoidType(), 0, 0, [FloatType()]),
-            FuncSym("writeFloat", VoidType(), 0, 0),
-            FuncSym("readBoolean", VoidType(), 0, 0, [BooleanType()]),
-            FuncSym("printBoolean", VoidType(), 0, 0),
-            FuncSym("readString", VoidType(), 0, 0, [StringType()]),
-            FuncSym("printString", VoidType())
-        ]
-        
-        self.context = context if context is not None else Context()
+    def refactor(self):
+        return self.visit(self.ast, ASTRefactorerContext())
     
-    def update_current_datatype(typ : Type):
-        self.context.current_datatype = type
-        return self
-
-    def update_scope(self, scope):
-        self.context.scope = scope
-        self.context.line_in_scope = 0
-
-        return self
+    def visitProgram(self, ast: Program, ctx : ASTRefactorerContext):
+        return Program([self.visit(decl, ctx) for decl in ast.decls])
     
-    def add_symbol(self, symbol: Symbol):
-        '''
-        Add a new Symbol to the current Symbol Table and return a new Symbol Table instance
-        '''
-        self.symbols.append(symbol)
-        self.context.line_in_scope += 1
-
-        return self
+    def visitFuncDecl(self, ast : FuncDecl, ctx : ASTRefactorerContext):
+        return FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, ctx))
     
-    def find_symbol(self, name: str):
-        for symbol in self.symbols:
-            if symbol.name == name:
-                return symbol
-        return None
-    
-    def type_inference(self, name, typ):
-        symbol = self.find_symbol(name)
-        symbol.datatype = typ
+    def visitBlock(self, ast : Block, ctx : ASTRefactorerContext):
+        visited_stmts = []
+        for stmt in ast.stmts:
+          visited_stmt = self.visit(stmt, ctx)
+          # print(146, visited_stmt)
+          if isinstance(visited_stmt, list):
+            visited_stmts += visited_stmt
+          else:
+            visited_stmts += [visited_stmt]
+        return Block(visited_stmts)
 
-        return self
+    def visitAssignStmt(self, ast : AssignStmt, ctx : ASTRefactorerContext):
+        ctx.last_sym = None
+        visited_rhs = self.visit(ast.rhs, ctx)
+        if ctx.last_sym is not None:
+          return visited_rhs + [AssignStmt(ast.lhs, visited_rhs[-1].lhs)]
+        return ast
+
+    def visitIfStmt(self, ast : IfStmt, ctx : ASTRefactorerContext):
+        visited_cond = self.visit(ast.cond, ctx)
+        visited_tstmt = self.visit(ast.tstmt, ctx)
+        visited_fstmt = self.visit(ast.fstmt, ctx) if ast.fstmt is not None else None
+
+        if len(visited_cond) > 0:
+          return visited_rhs + [IfStmt(visited_rhs[-1].name, visited_tstmt, visited_fstmt)]
+
+        return IfStmt(ast.cond, visited_tstmt, visited_fstmt)
+
+    def visitWhileStmt(self, ast : WhileStmt, ctx : ASTRefactorerContext):
+        visited_stmt = self.visit(ast.stmt, ctx)
+
+        ctx.last_sym = None
+        visited_cond = self.visit(ast.cond, ctx)
+
+        if ctx.last_sym is not None:
+          return visited_cond + [WhileStmt(visited_cond[-1].lhs, Block(visited_stmt.stmts + visited_cond))]
+
+        return WhileStmt(ast.cond, visited_stmt)
+    
+    def visitDoWhileStmt(self, ast : DoWhileStmt, ctx : ASTRefactorerContext):
+        visited_cond = self.visit(ast.cond, ctx)
+        visited_stmt = self.visit(ast.stmt, ctx)
+
+        if len(visited_cond) > 0:
+          return visited_cond + [DoWhileStmt(visited_rhs[-1].name, Block(visited_stmt.stmts + visited_cond))]
+
+        return DoWhileStmt(ast.cond, visited_stmt)
+
+    def visitBinExpr(self, ast : BinExpr, ctx : ASTRefactorerContext):
+      visited_left = self.visit(ast.left, ctx)
+      left_sym = ctx.last_sym
+
+      visited_right = self.visit(ast.right, ctx)
+      right_sym = ctx.last_sym
+
+      sym_to_use = Id(f"{ctx.used_sym}_tmp")
+      ctx.used_sym += 1
+      ctx.last_sym = sym_to_use
+
+      return visited_left + visited_right + [AssignStmt(sym_to_use, BinExpr(ast.op, left_sym, right_sym))]
+
+    def visitUnExpr(self, ast : UnExpr, ctx : ASTRefactorerContext):
+      visited_val = self.visit(ast.val, ctx)
+      val_sym = ctx.last_sym
+
+      sym_to_use = f"{ctx.used_sym}_tmp"
+      ctx.used_sym += 1
+
+      return visited_val + [AssignStmt(Id(sym_to_use), UnExpr(ast.op, val_sym))]
+
+    def visitId(self, ast : Id, ctx : ASTRefactorerContext):
+      ctx.last_sym = ast
+      return []
+
+    def visitIntegerLit(self, ast : IntegerLit, ctx : ASTRefactorerContext):
+      return []
+
+    def visitFloatLit(self, ast : FloatLit, ctx : ASTRefactorerContext):
+      return []
+
+    def visitBooleanLit(self, ast : BooleanLit, ctx : ASTRefactorerContext):
+      return []
+
+    def visitStringLit(self, ast : StringLit, ctx : ASTRefactorerContext):
+      return []
+
+    def visitArrayLit(self, ast : ArrayLit, ctx : ASTRefactorerContext):
+      last_stmts = []
+      for expr in ast.explist:
+        visited_expr = self.visit(expr, ctx)
+        if len(visited_expr) > 0:
+          last_stmts += visited_expr
+          expr = Id(ctx.last_sym)
+      return last_stmts
+
+    def visitArrayCell(self, ast : ArrayCell, ctx : ASTRefactorerContext):
+      last_stmts = []
+      for expr in ast.cell:
+        visited_expr = self.visit(expr, ctx)
+        if len(visited_expr) > 0:
+          last_stmts += visited_expr
+          expr = Id(ctx.last_sym)
+      return last_stmts + []
+

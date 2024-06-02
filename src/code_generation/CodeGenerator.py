@@ -25,9 +25,9 @@ class CodeGenerator(CFGVisitor):
   def __init__(self, ast : AST, num_reg : int):
 
     self.ast = ASTRefactorer(ast).refactor()
-    print(self.ast)
+    print(28, self.ast)
     self.cfg = CFGBuilder(self.ast).build()
-    print(self.cfg)
+    print(30, self.cfg)
     self.st = SymbolTableBuilder(self.ast).build()
     # print(self.st)
 
@@ -37,7 +37,7 @@ class CodeGenerator(CFGVisitor):
       if attr is not None:
         self.reg_alloc[node] = f'${attr}'
 
-    print(self.reg_alloc)
+    # print(self.reg_alloc)
 
   def generate(self):
     # Create data field for unallocated symbols

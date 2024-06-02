@@ -1,6 +1,6 @@
 \subsection{AST Refactor}
 
-AST refactor modifies the AST in preparation for later processes. Since, variable declaration before using has been checked in frontend, so we only need statements that use these variables, recorded their data types. To sum up, the Refactorer helps us:
+AST refactor modifies the AST in preparation for later processes. Since variable declaration before using has been checked in frontend, we only need statements that use these variables, while recorded their data types. To sum up, the Refactorer helps us:
 
 \begin{itemize}
   \item Eliminate dead code after ReturnStmt in FuncDecl.
@@ -13,8 +13,9 @@ AST refactor modifies the AST in preparation for later processes. Since, variabl
 
 \begin{lstlisting}[language=Python]
 class ASTRefactorContext:
-  def __init__(self,
-              in_func : str or None, # The name of the function that the visited statement belongs to
-              st : SymbolTable,      # The symbol table
-              )
+class ASTRefactorerContext:
+  def __init__(self, 
+              last_sym # last symbol accessed by the last sub-expression, excluded to BinExpr unwrapper
+              used_sum # the symbol that will be used by sub-expressions):
+    # Initializations
 \end{lstlisting}

@@ -3,9 +3,29 @@ from typing import List, Tuple
 
 class AST(Visitee): pass
 
+# Statment container
+class StmtBlock(AST):
+    def __init__(self, stmts):
+        self.stmts = stmts
+
+    def __repr__(self):
+        return "StmtBlock([{}])".format(",\n".join([str(stmt) for stmt in self.stmts]))
+    
+    def get_index_of_stmt(self, stmt):
+        for i in range(len(self.stmts)):
+            if stmt.id == self.stmts[i].id:
+                return i
+        return None
+    
+    def insert_stmt(self, index, stmt):
+        self.stmts.insert(index, stmt)
+
+        return self
+
 class Stmt(AST): 
-    def __init__(self, _id = None):
-        self.id = _id
+    def __init__(self, _id = None, block: StmtBlock or None = None):
+        self.id = _id if _id is not None else None
+        self.block = block if block is not None else None
 class Expr(AST): 
     def __int__(self,  _id = None):
         self.id = _id
@@ -13,7 +33,7 @@ class Type(AST): pass
 class Decl(AST): pass
 
 class Program(AST):
-    def __init__(self, decls: List[Decl]):
+    def __init__(self, decls):
         self.decls = decls
 
     def __repr__(self):
@@ -118,7 +138,7 @@ class Id(Expr):
     def __init__(self, name: str):
         self.name = name
     def __repr__(self):
-        return self.name
+        return f"Id({self.name})"
 
 class ArrayCell(Expr):
     def __init__(self, name: str, cell: List[Expr]):
@@ -161,89 +181,93 @@ class FuncCall(Expr):
 ############################### Statements ##################################
 
 class AssignStmt(Stmt):
-    def __init__(self, lhs: ArrayCell or Id, rhs: Expr, typ: Type or None = None, _id = None):
-        super().__init__(_id)
+    def __init__(self, lhs: ArrayCell or Id, rhs: Expr, typ: Type or None = None):
+        super().__init__()
         self.lhs = lhs
         self.rhs = rhs
         self.typ = typ
     def __repr__(self):
-        return f"Assign({str(self.lhs)}, {str(self.rhs)})"
-
-class BlockStmt(Stmt):
-    def __init__(self, stmts: List[Stmt or VarDecl]):
-        self.stmts = stmts
-
-    def __repr__(self):
-        return "Block([{}])".format(",\n".join([str(stmt) for stmt in self.stmts]))
+        return f"{self.id}: Assign({str(self.lhs)}, {str(self.rhs)})"
 
 class IfStmt(Stmt):
     def __init__(self, cond: Expr, tstmt: Stmt, fstmt: Stmt or None = None):
+        super().__init__()
         self.cond = cond
         self.tstmt = tstmt
         self.fstmt = fstmt
 
     def __repr__(self):
-        return "If({}, {}{})".format(str(self.cond), str(self.tstmt), ", " + str(self.fstmt) if self.fstmt else "")
+        return f"{self.id}: If({str(self.cond)}, {str(self.tstmt)}{str(self.fstmt) if self.fstmt else ''})"
 
 class ForStmt(Stmt):
     def __init__(self, init: AssignStmt, cond: Expr, upd: Expr, stmt: Stmt):
+        super().__init__()
         self.init = init
         self.cond = cond
         self.upd = upd
         self.stmt = stmt
 
     def __repr__(self):
-        return "ForStmt({}, {}, {}, {})".format(str(self.init), str(self.cond), str(self.upd), str(self.stmt))
+        return f"{self.id}: ForStmt({str(self.init)}, {str(self.cond)}, {str(self.upd)}, {str(self.stmt)})"
 
 class WhileStmt(Stmt):
     def __init__(self, cond: Expr, stmt: Stmt):
+        super().__init__()
         self.cond = cond
         self.stmt = stmt
 
     def __repr__(self):
-        return "While({}, {})".format(str(self.cond), str(self.stmt))
+        return f"{self.id}: While({str(self.cond)}, {str(self.stmt)})"
 
 class DoWhileStmt(Stmt):
-    def __init__(self, cond: Expr, stmt: BlockStmt):
+    def __init__(self, cond: Expr, stmt: StmtBlock):
+        super().__init__()
         self.cond = cond
         self.stmt = stmt
 
     def __repr__(self):
-        return "DoWhileStmt({}, {})".format(str(self.cond), str(self.stmt))
+        return f"{self.id}: DoWhileStmt({str(self.cond)}, {str(self.stmt)})"
 
 class BreakStmt(Stmt):
+    def __init__(self):
+        super().__init__()
     def __repr__(self):
-        return "BreakStmt()"
+        return f"{self.id}: BreakStmt()"
 
 class ContinueStmt(Stmt):
+    def __init__(self):
+        super().__init__()
+
     def __repr__(self):
-        return "ContinueStmt()"
+        return f"{self.id}: ContinueStmt()"
 
 class ReturnStmt(Stmt):
     def __init__(self, expr: Expr or None = None):
+        super().__init__()
         self.expr = expr
 
     def __repr__(self):
-        return "ReturnStmt({})".format(str(self.expr) if self.expr else "")
+        return f"{self.id}: ReturnStmt({str(self.expr) if self.expr else ''})"
 
 class CallStmt(Stmt):
     def __init__(self, name: str, args: List[Expr]):
+        super().__init__()
         self.name = name
         self.args = args
 
     def __repr__(self):
-        return "CallStmt({}, {})".format(self.name, ", ".join([str(expr) for expr in self.args]))
+        return f"{self.id}: CallStmt({self.name}, {', '.join([str(expr) for expr in self.args])})"
 
 ########################### Declarations ################################
 
 class VarDecl(Stmt):
-    def __init__(self, name: str, typ: Type, init: Expr or None = None, _id = None):
-        super().__init__(_id)
+    def __init__(self, name: str, typ: Type, init: Expr or None = None):
+        super().__init__()
         self.name = name
         self.typ = typ
         self.init = init
     def __repr__(self):
-        return f"VarDecl({self.name}, {self.typ}{(', ' + str(self.init)) if self.init is not None else ''})"
+        return f"{self.id}: VarDecl({self.name}, {self.typ}{(', ' + str(self.init)) if self.init is not None else ''})"
 
 class ParamDecl(Decl):
     def __init__(self, name: str, typ: Type, out: bool = False, inherit: bool = False):
@@ -256,7 +280,7 @@ class ParamDecl(Decl):
         return "{}{}Param({}, {})".format("Inherit" if self.inherit else "", "Out" if self.out else "", self.name, str(self.typ))
 
 class FuncDecl(Decl):
-    def __init__(self, name: str, rtype: Type, params: List[ParamDecl], inherit: str or None, body: BlockStmt):
+    def __init__(self, name: str, rtype: Type, params: List[ParamDecl], inherit: str or None, body: StmtBlock):
         self.name = name
         self.rtype = rtype
         self.params = params

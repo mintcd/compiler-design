@@ -68,7 +68,7 @@ class SymbolTableBuilder(ASTVisitor):
 
       return data
 
-  def visitBlockStmt(self, ast : BlockStmt, data):
+  def visitASTBlock(self, ast : StmtBlock, data):
     for stmt in ast.stmts:
       data = self.visit(stmt, data)
     return data

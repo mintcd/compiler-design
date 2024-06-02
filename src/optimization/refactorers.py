@@ -2,221 +2,459 @@ from utils.visitors import ASTVisitor, CFGVisitor
 from utils.structures.CFG import CFG, Block
 from utils.structures.AST import *
 from typing import List
+import copy
 
 class ASTRefactorerContext:
-  def __init__(self, last_sym : int or None = None):
-    self.last_sym = last_sym
+  def __init__(self, last_expr : int or None = None):
+    self.last_expr : Expr = last_expr
     self.used_sym = 0
 
-class ASTRefactorer:
+    self.current_block: Block or None = None
+    self.stmt_id = 0
+    self.current_stmt: Stmt or None = None
+
+    self.current_id = [0]
+
+class ASTRefactorerData:
+  def __init__(self, obj : Program, ctx : ASTRefactorerContext):
+    self.obj = obj
+    self.ctx = ctx
+
+class ASTRefactorer(ASTVisitor):
+
     '''
-      1) Eliminates dead code after Return.
-      2) Turns Stmt used in IfStmt, WhileStmt and ForStmt to BlockStmt
-      3) Turn initiated vardecl to assignstmt with infered type
-      4) Turn For to While
-      5) Unwrap BinExpr
+      1) Assign a unique id to each stmt
+      2) Eliminates dead code after Return.
+      3) Turns Stmt used in IfStmt, WhileStmt and ForStmt to Block
+      4) Turn initiated vardecl to assignstmt with infered type
+      5) Turn For to While
+      6) Unwrap BinExpr
     '''
-    def __init__(self, ast):
+
+    def __init__(self, ast : Program):
         self.ast = ast
 
     def refactor(self):
-        ast = ASTRefactorer23(self.ast).refactor()
+        ast = SubstatementRefactorer(self.ast).refactor()
+        ast = VarDeclRefactorer(ast).refactor()
+        ast = ForToWhile(ast).refactor()
+        ast = BinExprUnwrapper(ast).refactor()
 
-        ast = ASTRefactorer4(ast).refactor()
-
-        ast = ASTRefactorer5(ast).refactor()  
-
-        return ast       
-
-class ASTRefactorer23(ASTVisitor):
-    def __init__(self, ast):
-        self.ast = ast
-
-    def refactor(self):
-        return self.visit(self.ast, None)
-    
-    def visitProgram(self, ast: Program, _):
-        return Program([self.visit(decl, _) for decl in ast.decls])
-    
-    def visitFuncDecl(self, ast : FuncDecl, _):
-        return FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, _))
-    
-    def visitVarDecl(self, ast : VarDecl, _):
-        if ast.init is not None:
-          return AssignStmt(Id(ast.name), ast.init, ast.typ)
-        return []
-
-    def visitBlockStmt(self, ast : BlockStmt, _):
-        visited_stmts = []
-        for stmt in ast.stmts:
-          visited_stmt = self.visit(stmt, None)
-          if isinstance(visited_stmt, list):
-            visited_stmts += visited_stmt
-          else:
-            visited_stmts += [visited_stmt]
-        return BlockStmt(visited_stmts)
-
-    def visitAssignStmt(self, ast : AssignStmt, _):
         return ast
 
-    def visitIfStmt(self, ast : IfStmt, _):
-        if not isinstance(ast.tstmt, BlockStmt):
-          ast.tstmt = BlockStmt([ast.tstmt])
-        if ast.fstmt is not None and not isinstance(ast.fstmt, BlockStmt):
-          ast.fstmt = BlockStmt([ast.fstmt])
+class SubstatementRefactorer(ASTVisitor):
+    '''
+      Turns Stmt used in 
 
-        return IfStmt(ast.cond, 
-                      self.visit(ast.tstmt, _), 
-                      self.visit(ast.fstmt, _) if ast.fstmt is not None else None)
+        IfStmt, 
+        WhileStmt, and
+        ForStmt 
 
-    def visitWhileStmt(self, ast : WhileStmt, _):
-        if not isinstance(ast.stmt, BlockStmt):
-          ast.stmt = BlockStmt([ast.stmt])
+      to Block 
+    '''
+
+    def __init__(self, ast):
+        self.ast = ast
+
+    def refactor(self):
+        data = ASTRefactorerData(self.ast, ASTRefactorerContext())
+        return self.visit(self.ast, data).obj
+    
+    def visitProgram(self, ast: Program, data : ASTRefactorerData):
+        for decl in ast.decls:
+          data = self.visit(decl, data)
+
+        return data
+    
+    def visitFuncDecl(self, ast : FuncDecl, data : ASTRefactorerData):
+        for decl in data.obj.decls:
+          if decl.name == ast.name:
+            decl = FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, data))
+
+        return data
+
+    def visitASTBlock(self, ast : StmtBlock, data : ASTRefactorerData):
+        for stmt in ast.stmts:
+          data = self.visit(stmt, data)
+
+        return data
+        
+    def visitIfStmt(self, ast : IfStmt, data : ASTRefactorerData):
+        # Retrieve the ctx
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        # Turn the stmts to Block and visit it
+        if not isinstance(ast.tstmt, Block):
+          ast.tstmt = StmtBlock([ast.tstmt])
+          data = self.visit(ast.tstmt, data)
+
+        if ast.fstmt is not None and not isinstance(ast.fstmt, Block):
+          ast.fstmt = StmtBlock([ast.fstmt])
+          data = self.visit(ast.fstmt, data)
+
+        # Use ctx to modify ast correctly
+        self_block.stmts[self_num[-1]] = ast
+
+        return data
+
+    def visitWhileStmt(self, ast : WhileStmt, data : ASTRefactorerData):
+        # Retrieve the ctx
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        if not isinstance(ast.stmt, Block):
+          ast.stmt = StmtBlock([ast.stmt])
+
+        self_block.stmts[self_num[-1]] = ast
    
-        return WhileStmt(ast.cond, self.visit(ast.stmt, _))
+        return data
         
-    def visitForStmt(self, ast: ForStmt, _): 
-        if not isinstance(ast.tstmt, BlockStmt):
-          ast.stmt = BlockStmt([ast.stmt])
-        
-        return ForStmt(ast.init, ast.cond, ast.upd)
+    def visitForStmt(self, ast: ForStmt, data): 
+        # Retrieve the ctx
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
 
-    
-    def visitDoWhileStmt(self, ast : DoWhileStmt, _):
-      return ast
+        if not isinstance(ast.stmt, Block):
+          ast.stmt = StmtBlock([ast.stmt])
+ 
+        return data
 
-class ASTRefactorer4(ASTVisitor):
+    def visitDoWhileStmt(self, ast : DoWhileStmt, data):
+      return data
+
+    def visitVarDecl(self, ast : VarDecl, data):
+        return data
+
+    def visitAssignStmt(self, ast : AssignStmt, data):
+        return data
+
+class VarDeclRefactorer(ASTVisitor):
+
     '''
-      Turn For to While
+      Remove VarDecl(x, typ)
+      Turn VarDecl(x, typ, init) to AssignStmt(x, init)
     '''
+
     def __init__(self, ast):
         self.ast = ast
 
     def refactor(self):
-        return self.visit(self.ast, None)
+        data = ASTRefactorerData(self.ast, ASTRefactorerContext())
+        return self.visit(self.ast, data).obj
+     
+    def visitProgram(self, ast: Program, data : ASTRefactorerData):
+        for decl in ast.decls:
+          data = self.visit(decl, data)
+
+        return data
     
-    def visitProgram(self, ast: Program, _):
-        return Program([self.visit(decl, _) for decl in ast.decls])
-    
-    def visitFuncDecl(self, ast : FuncDecl, _):
-        return FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, _))
-    
-    def visitVarDecl(self, ast : VarDecl, _):
-        return ast
+    def visitFuncDecl(self, ast : FuncDecl, data : ASTRefactorerData):
+        for decl in data.obj.decls:
+          if decl.name == ast.name:
+            decl = FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, data))
 
-    def visitBlockStmt(self, ast : BlockStmt, _):
-        visited_stmts = []
-        for stmt in ast.stmts:
-          visited_stmt = self.visit(stmt, None)
-          if isinstance(visited_stmt, list):
-            visited_stmts += visited_stmt
-          else:
-            visited_stmts += [visited_stmt]
-        return BlockStmt(visited_stmts)
+        return data
 
-    def visitAssignStmt(self, ast : AssignStmt, _):
-        return ast
+    def visitASTBlock(self, ast : Block, data : ASTRefactorerData):
+        stmts = ast.stmts
+        for i in range(len(stmts)):
+          # Set ctx appropriately
+          ctx = data.ctx
+          ctx.current_block = ast
 
-    def visitIfStmt(self, ast : IfStmt, _):
-        return IfStmt(ast.cond, 
-                      self.visit(ast.tstmt, _), 
-                      self.visit(ast.fstmt, _) if ast.fstmt is not None else None)
+          ctx.stmt_id = i
+          data = self.visit(stmts[i], data)
 
-    def visitWhileStmt(self, ast : WhileStmt, _):   
-        return WhileStmt(ast.cond, self.visit(ast.stmt, _))
-    
-    def visitDoWhileStmt(self, ast : DoWhileStmt, _):
-      return ast 
+        return data
 
-class ASTRefactorer5(ASTVisitor):
+    def visitIfStmt(self, ast : IfStmt, data : ASTRefactorerData):
+        # Retrieve the ctx
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.tstmt, data)
+        if ast.fstmt is not None:
+          data = self.visit(ast.fstmt, data)
+
+        return data
+
+    def visitWhileStmt(self, ast : WhileStmt, data : ASTRefactorerData):
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+
+        return data
+        
+    def visitForStmt(self, ast: ForStmt, data): 
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+
+        return data
+
+    def visitDoWhileStmt(self, ast : DoWhileStmt, data):
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+
+        return data
+
+    def visitVarDecl(self, ast : VarDecl, data : ASTRefactorerData):
+        ctx = data.ctx
+        if ast.init is None:
+          ctx.current_block.stmts.remove(ast)
+        else:
+          ctx.current_block.stmts[ctx.stmt_id] = AssignStmt(ast, ast.init)   
+        return data
+
+    def visitAssignStmt(self, ast : AssignStmt, data):
+        return data
+
+class ForToWhile(ASTVisitor):
+
+    '''
+      Turn ForStmt to WhileStmt
+    '''
+
     def __init__(self, ast):
         self.ast = ast
 
     def refactor(self):
-        return self.visit(self.ast, ASTRefactorerContext())
+        data = ASTRefactorerData(self.ast, ASTRefactorerContext())
+        return self.visit(self.ast, data).obj
+     
+    def visitProgram(self, ast: Program, data : ASTRefactorerData):
+        for decl in ast.decls:
+          data = self.visit(decl, data)
+
+        return data
     
-    def visitProgram(self, ast: Program, ctx : ASTRefactorerContext):
-        return Program([self.visit(decl, ctx) for decl in ast.decls])
+    def visitFuncDecl(self, ast : FuncDecl, data : ASTRefactorerData):
+        for decl in data.obj.decls:
+          if decl.name == ast.name:
+            decl = FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, data))
+
+        return data
+
+    def visitASTBlock(self, ast : Block, data : ASTRefactorerData):
+        stmts = ast.stmts
+        for i in range(len(stmts)):
+          # Set ctx appropriately
+          ctx = data.ctx
+          ctx.current_block = ast
+
+          ctx.stmt_id = i
+          data = self.visit(stmts[i], data)
+
+        return data
+
+    def visitIfStmt(self, ast : IfStmt, data : ASTRefactorerData):
+        # Retrieve the ctx
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.tstmt, data)
+        if ast.fstmt is not None:
+          data = self.visit(ast.fstmt, data)
+
+        return data
+
+    def visitWhileStmt(self, ast : WhileStmt, data : ASTRefactorerData):
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+
+        return data
+        
+    def visitForStmt(self, ast: ForStmt, data : ASTRefactorerData): 
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+        upd_stmts = [ast.init, WhileStmt(ast.cond, StmtBlock(ast.stmt.stmts + [AssignStmt(ast.init.lhs, ast.upd)]))]
+
+        if self_num == len(self_block.stmts) - 1:
+          self_block.stmts = self_block.stmts[:self_num] + upd_stmts
+        else:
+          self_block.stmts = self_block.stmts[:self_num] + upd_stmts +self_block.stmts[self_num+1:]
+
+        return data
+
+    def visitDoWhileStmt(self, ast : DoWhileStmt, data):
+        self_block = data.ctx.current_block
+        self_num = data.ctx.stmt_id
+
+        data = self.visit(ast.stmt, data)
+
+        return data
+
+    def visitVarDecl(self, ast : VarDecl, data : ASTRefactorerData):
+        return data
+
+    def visitAssignStmt(self, ast : AssignStmt, data):
+        return data
+
+class BinExprUnwrapper(ASTVisitor):
+
+    '''
+      Unwrap BinExpr
+    '''
+
+    def __init__(self, ast):
+        self.ast = InforAssigner(ast).assign()
+
+    def refactor(self):
+        data = ASTRefactorerData(self.ast, ASTRefactorerContext())
+        return self.visit(self.ast, data).obj
+     
+    def visitProgram(self, ast: Program, data : ASTRefactorerData):
+        for decl in ast.decls:
+          data = self.visit(decl, data)
+
+        return data
     
-    def visitFuncDecl(self, ast : FuncDecl, ctx : ASTRefactorerContext):
-        return FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, ctx))
-    
-    def visitBlockStmt(self, ast : BlockStmt, ctx : ASTRefactorerContext):
-        visited_stmts = []
+    def visitFuncDecl(self, ast : FuncDecl, data : ASTRefactorerData):
+        for decl in data.obj.decls:
+          if decl.name == ast.name:
+            decl = FuncDecl(ast.name, ast.rtype, ast.params, ast.inherit, self.visit(ast.body, data))
+
+        return data
+
+    def visitASTBlock(self, ast : StmtBlock, data : ASTRefactorerData):
         for stmt in ast.stmts:
-          visited_stmt = self.visit(stmt, ctx)
-          # print(146, visited_stmt)
-          if isinstance(visited_stmt, list):
-            visited_stmts += visited_stmt
-          else:
-            visited_stmts += [visited_stmt]
-        return BlockStmt(visited_stmts)
+          data = self.visit(stmt, data)
 
-    def visitAssignStmt(self, ast : AssignStmt, ctx : ASTRefactorerContext):
-        # print(155, ast.rhs)
-        visited_rhs = self.visit(ast.rhs, ctx)
-        if len(visited_rhs) > 0:
-          return visited_rhs + [AssignStmt(ast.lhs, visited_rhs[-1].lhs)]
-        # print(158, visited_rhs, ast)
-        return ast
+        return data
 
-    def visitIfStmt(self, ast : IfStmt, ctx : ASTRefactorerContext):
-        visited_cond = self.visit(ast.cond, ctx)
-        visited_tstmt = self.visit(ast.tstmt, ctx)
-        visited_fstmt = self.visit(ast.fstmt, ctx) if ast.fstmt is not None else None
+    def visitIfStmt(self, ast : IfStmt, data : ASTRefactorerData): 
+        data.ctx.current_stmt = ast
 
-        if len(visited_cond) > 0:
-          return visited_rhs + [IfStmt(visited_rhs[-1].name, visited_tstmt, visited_fstmt)]
+        data = self.visit(ast.cond, data)
+        data = self.visit(ast.tstmt, data)
 
-        return IfStmt(ast.cond, visited_tstmt, visited_fstmt)
+        if ast.fstmt is not None:
+          data = self.visit(ast.fstmt, data)
+        
+        data.ctx.used_sym = 0
 
-    def visitWhileStmt(self, ast : WhileStmt, ctx : ASTRefactorerContext):
-        visited_cond = self.visit(ast.cond, ctx)
-        visited_stmt = self.visit(ast.stmt, ctx)
+        return data
 
-        if len(visited_cond) > 0:
-          return visited_cond + [WhileStmt(visited_rhs[-1].name, BlockStmt(visited_stmt.stmts + visited_cond))]
+    def visitWhileStmt(self, ast : WhileStmt, data : ASTRefactorerData):
+        data.ctx.current_stmt = ast
 
-        return WhileStmt(ast.cond, visited_stmt)
+        data = self.visit(ast.cond, data)
+        data = self.visit(ast.stmt, data)
+
+        data.ctx.used_sym = 0
+
+        return data
+        
+    def visitDoWhileStmt(self, ast : DoWhileStmt, data):
+        data.ctx.current_stmt = ast
+        
+        data = self.visit(ast.cond)
+        data = self.visit(ast.stmt, data)
+
+        data.ctx.used_sym = 0
+
+        return data
+
+    def visitAssignStmt(self, ast : AssignStmt, data):
+        data.ctx.current_stmt = ast
+
+        data = self.visit(ast.rhs, data)
+        
+        ast.rhs = data.ctx.last_expr
+
+        data.ctx.used_sym = 0
+
+        return data
+
+    def visitBinExpr(self, ast : BinExpr, data : ASTRefactorerData):
+      current_stmt = data.ctx.current_stmt
+
+      data = self.visit(ast.left, data)
+      left_expr = data.ctx.last_expr
+
+      data = self.visit(ast.right, data)
+      right_expr = data.ctx.last_expr
+
+      stmt_id = current_stmt.block.get_index_of_stmt(current_stmt)
+      last_expr = Id(f"tmp_{data.ctx.used_sym}")
+
+      current_stmt.block.stmts = current_stmt.block.stmts[:stmt_id] \
+                                + [AssignStmt(last_expr, BinExpr(ast.op, left_expr, right_expr))] \
+                                + current_stmt.block.stmts[stmt_id:]
+
+      data.ctx.used_sym += 1
+      data.ctx.last_expr = last_expr
+
+      return data
+      
+    def visitUnExpr(self, ast : UnExpr, data : ASTRefactorerData):
+      current_stmt = data.ctx.current_stmt
+
+      data = self.visit(ast.val, data)
+      val_expr = data.ctx.last_expr
+
+      stmt_id = current_stmt.block.get_index_of_stmt(current_stmt)
+      last_expr = Id(f"tmp_{data.ctx.used_sym}")
+
+      block_stmts = current_stmt.block.stmts
+
+      block_stmts = block_stmts[:stmt_id] + [AssignStmt(last_expr, BinExpr(ast.op, left_expr, right_expr))] + block_stmts[stmt_id:]
+
+
+      data.ctx.used_sym += 1
+      data.ctx.last_expr = last_expr
+
+      return data
+
+    def visitId(self, ast : Id, data : ASTRefactorerData):
+      data.ctx.last_expr = ast
+
+      return data
+
+    def visitArrayCell(self, ast, data):
+      for expr in ast.cell:
+        data = self.visit(expr)
+        
+      data.ctx.last_expr = ast
+
+      return data
+
+    def visitIntegerLit(self, ast, data):
+      data.ctx.last_expr = ast
+
+      return data
+
+    def visitFloatLit(self, ast, data):
+      data.ctx.last_expr = ast
+
+      return data
     
-    def visitDoWhileStmt(self, ast : DoWhileStmt, ctx : ASTRefactorerContext):
-        visited_cond = self.visit(ast.cond, ctx)
-        visited_stmt = self.visit(ast.stmt, ctx)
+    def visitStringLit(self, ast, data : ASTRefactorerData):
+      data.ctx.last_expr = ast
 
-        if len(visited_cond) > 0:
-          return visited_cond + [DoWhileStmt(visited_rhs[-1].name, BlockStmt(visited_stmt.stmts + visited_cond))]
+      return data
 
-        return DoWhileStmt(ast.cond, visited_stmt)
+    def visitBooleanLit(self, ast, data : ASTRefactorerData):
+      data.ctx.last_expr = ast
 
-    def visitBinExpr(self, ast : BinExpr, ctx : ASTRefactorerContext):
-      visited_left = self.visit(ast.left, ctx)
-      left_sym = ctx.last_sym
+      return data
 
-      visited_right = self.visit(ast.right, ctx)
-      right_sym = ctx.last_sym
+    def visitArrayLit(self, ast, data : ASTRefactorerData):
+      for expr in ast.exprlist:
+        data = self.visit(expr)
+        
+      data.ctx.last_expr = ast
 
-      sym_to_use = Id(f"{ctx.used_sym}_tmp")
-      ctx.used_sym += 1
-      ctx.last_sym = sym_to_use
-
-      return visited_left + visited_right + [AssignStmt(sym_to_use, BinExpr(ast.op, left_sym, right_sym))]
-
-    def visitUnExpr(self, ast : UnExpr, ctx : ASTRefactorerContext):
-      visited_val = self.visit(ast.val, ctx)
-      val_sym = ctx.last_sym
-
-      sym_to_use = f"{ctx.used_sym}_tmp"
-      ctx.used_sym += 1
-
-      return visited_val + [AssignStmt(Id(sym_to_use), UnExpr(ast.op, val_sym))]
-
-    def visitId(self, ast : Id, ctx : ASTRefactorerContext):
-      ctx.last_sym = ast
-      return []
-
-    def visitIntegerLit(self, ast : IntegerLit, ctx : ASTRefactorerContext):
-      return []
-
+      return data
 
 class CFGRefactorer(CFGVisitor):
   '''

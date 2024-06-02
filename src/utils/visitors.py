@@ -4,6 +4,9 @@ from utils.structures.AST import *
 
 class ASTVisitor(Visitor):
 
+    def __init__(self, ast):
+        self.ast = ast
+
     def visitFloatType(self, ast : FloatType, data : VisitData): 
         return data
     
@@ -58,7 +61,7 @@ class ASTVisitor(Visitor):
     def visitAssignStmt(self, ast : AssignStmt, data : VisitData): 
         return data
  
-    def visitBlockStmt(self, ast : BlockStmt, data : VisitData): 
+    def visitASTBlock(self, ast : Block, data : VisitData): 
         return data
 
     def visitIfStmt(self, ast, data : VisitData):

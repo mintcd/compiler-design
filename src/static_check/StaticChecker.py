@@ -38,7 +38,7 @@ class GlobalSymbolAdder(Visitor):
     def visitAssignStmt(self, ast, param):
         raise ContextError("Statements rather than variable declaration not allowed in global scope")
    
-    def visitBlockStmt(self, ast, param):
+    def visitBlock(self, ast, param):
         raise ContextError("Statements rather than variable declaration not allowed in global scope")
 
     def visitIfStmt(self, ast, param):
@@ -306,7 +306,7 @@ class StaticChecker(Visitor):
             raise CallError(f"Numbers of parameters and arguments in {ast.name} do not match.")
         return st
     
-    def visitBlockStmt(self, ast : BlockStmt, st : SymbolTable):
+    def visitBlock(self, ast : Block, st : SymbolTable):
         for stmt in ast.body:
             st = self.visit(stmt, st)
             if type(stmt) is ReturnStmt: break

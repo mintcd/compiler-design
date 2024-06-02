@@ -20,7 +20,8 @@ Up to now, we have live symbols at every statement. Two symbols cannot be alloca
     \ENDWHILE
 
     \WHILE{$S$ is not empty}
-    \STATE choose appropriate register for $N$
+    \STATE Add $N$ = $S$.pop() to $G$
+    \STATE Choose appropriate register for $N$ based on RIG
     \ENDWHILE
   \end{algorithmic}
 \end{algorithm}

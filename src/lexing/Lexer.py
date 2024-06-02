@@ -47,6 +47,10 @@ class Lexer:
     def t_newline(self, t):
         r'\n+'
         t.lexer.lineno += len(t.value)
+    
+    def t_COMMENT(self, t):
+        r'//.*|/\*([^*]|\*+[^*/])*\*+/'
+        pass
 
     # Error handling rule
     def t_error(self, t):

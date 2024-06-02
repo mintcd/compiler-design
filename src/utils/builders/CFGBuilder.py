@@ -37,7 +37,7 @@ class CFGBuilder(ASTVisitor):
                 for i in range(len(block.stmts)):
                     block.stmts[i].id = (block.id, i)
             else:
-                block.cond.id = (block.id, i)
+                block.cond.id = (block.id, 0)
 
         return cfg
     
@@ -84,7 +84,7 @@ class CFGBuilder(ASTVisitor):
         data.ctx.active_block.stmts.append(ast)
         return data
 
-    def visitBlockStmt(self, ast : BlockStmt, data : CFGData):
+    def visitASTBlock(self, ast : Block, data : CFGData):
         for stmt in ast.stmts:
             data = self.visit(stmt, data)
 

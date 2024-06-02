@@ -1,0 +1,6 @@
+main : function void() {
+  a,b,c,d,e,f : integer = 1,2,3,4,5,6;
+  a = b + c;
+  d = -a;
+  e = f;
+}

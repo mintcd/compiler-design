@@ -4,6 +4,7 @@ import argparse
 from lexing.Lexer import Lexer
 from parsing.Parser import Parser
 from code_generation.CodeGenerator import CodeGenerator
+from optimization.refactorers import ASTRefactorer
 
 src_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.path.dirname(src_path)
@@ -24,7 +25,7 @@ def parse(data):
     lexer = Lexer()
     parser = Parser()
 
-    ast = parser.parse(data)
+    ast = ASTRefactorer(parser.parse(data)).refactor()
 
     return ast
 

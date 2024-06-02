@@ -10,15 +10,17 @@ from code_generation.CodeGenerator import CodeGenerator
 import json
 
 data = '''main : function void() {
-  a,b,c,d,e,f : integer = 1,2,3,4,5,6;
-  a = b + c + d;
-  d = -a;
-  e = f;
+  a,b,c,d,e : integer = 1,2,3,4,5;
+  if (a > b) {
+    a = b;
+  }
 }'''
 
 ast = parse(data)
 
+print(ast)
+
 code = CodeGenerator(ast, 4).generate()
 
-print(code)
+# print(code)
 
