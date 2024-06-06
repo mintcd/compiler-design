@@ -1,5 +1,0 @@
-Program([
-	VarDecl(a, IntegerType)
-	VarDecl(b, ArrayType([2, 3], IntegerType))
-	VarDecl(_flag, BooleanType)
-])

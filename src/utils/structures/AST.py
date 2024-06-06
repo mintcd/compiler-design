@@ -1,7 +1,9 @@
 from utils.visitor_pattern import Visitee
 from typing import List, Tuple
 
-class AST(Visitee): pass
+class AST(Visitee): 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 # Statement container
 class StmtBlock(AST):
@@ -41,7 +43,11 @@ class Program(AST):
 
 class AtomicLiteral(Expr): pass
 
-########################### Expressions #############################
+########################### Expressions ##########################################
+
+class LHS(Expr):
+    def __init__(self):
+        super().__init__()   
 
 class BinExpr(Expr):
     def __init__(self, op: str, left: Expr, right: Expr):
@@ -98,14 +104,7 @@ class UnExpr(Expr):
         if self.op == "!":
             return not self.val.val
 
-class Id(Expr):
-    def __init__(self, name: str):
-        super().__init__()
-        self.name = name
-    def __repr__(self):
-        return f"Id({self.name})"
-
-class ArrayCell(Expr):
+class ArrayCell(LHS):
     def __init__(self, name: str, cell: List[Expr]):
         super().__init__()
         self.name = name
@@ -122,8 +121,25 @@ class FuncCall(Expr):
 class ArrayLit(Expr):
     def __init__(self, explist: List[Expr]):
         self.explist = explist
+
     def __repr__(self):
-        return f"[{', '.join(str(expr) for expr in self.explist)}]"
+        return f"Array([{', '.join(str(expr) for expr in self.explist)}])"
+
+    def get_value(self):
+        result = []
+        for expr in self.explist:
+            if isinstance(expr, ArrayLit):
+                result.append(expr.get_value())
+            else:
+                result.append(expr)
+        return result
+
+class Id(LHS):
+    def __init__(self, name: str):
+        super().__init__()
+        self.name = name
+    def __repr__(self):
+        return f"Id({self.name})"
 
 class IntegerLit(AtomicLiteral):
     def __init__(self, val: int):
@@ -158,7 +174,7 @@ class AssignStmt(Stmt):
         return f"{self.id}: Assign({str(self.lhs)}, {str(self.rhs)})"
 
 class IfStmt(Stmt):
-    def __init__(self, cond: Expr, tstmt: Stmt, fstmt: Stmt or None = None):
+    def __init__(self, cond: Expr, tstmt: StmtBlock, fstmt: StmtBlock or None = None):
         super().__init__()
         self.cond = cond
         self.tstmt = tstmt
@@ -168,7 +184,7 @@ class IfStmt(Stmt):
         return f"{self.id}: If({str(self.cond)}, {str(self.tstmt)}{str(self.fstmt) if self.fstmt else ''})"
 
 class ForStmt(Stmt):
-    def __init__(self, init: AssignStmt, cond: Expr, upd: Expr, stmt: Stmt):
+    def __init__(self, init: AssignStmt, cond: Expr, upd: Expr, stmt: StmtBlock):
         super().__init__()
         self.init = init
         self.cond = cond
@@ -179,7 +195,7 @@ class ForStmt(Stmt):
         return f"{self.id}: ForStmt({str(self.init)}, {str(self.cond)}, {str(self.upd)}, {str(self.stmt)})"
 
 class WhileStmt(Stmt):
-    def __init__(self, cond: Expr, stmt: Stmt):
+    def __init__(self, cond: Expr, stmt: StmtBlock):
         super().__init__()
         self.cond = cond
         self.stmt = stmt

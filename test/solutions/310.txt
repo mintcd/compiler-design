@@ -1,4 +1,0 @@
-Program([
-	FuncDecl(main, VoidType, [], None, BlockStmt([]))
-	FuncDecl(func, VoidType, [Param(a, ArrayType([10], IntegerType)), Param(arr, StringType)], None, BlockStmt([ReturnStmt(IntegerLit(0))]))
-])

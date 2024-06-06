@@ -6,5 +6,4 @@ main : function void() {
     else
       y = y - x;
   }
-  return x;
 }

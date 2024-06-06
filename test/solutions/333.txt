@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(main, VoidType, [], None, BlockStmt([DoWhileStmt(BinExpr(<, Id(z), UnExpr(-, IntegerLit(3))), BlockStmt([AssignStmt(Id(a), IntegerLit(3)), VarDecl(foo, ArrayType([3], IntegerType)), DoWhileStmt(BinExpr(==, Id(x), IntegerLit(3)), BlockStmt([DoWhileStmt(BinExpr(>, BinExpr(+, Id(x), IntegerLit(1)), IntegerLit(0)), BlockStmt([DoWhileStmt(IntegerLit(9), BlockStmt([AssignStmt(Id(x), BinExpr(+, Id(x), IntegerLit(1)))]))]))]))]))]))
-])

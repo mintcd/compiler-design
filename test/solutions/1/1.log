@@ -1,0 +1,55 @@
+Original AST
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([None: VarDecl(x, IntegerType, 5),
+None: VarDecl(y, IntegerType, 10),
+None: While(BinExpr(!=, Id(x), Id(y)), StmtBlock([None: If(BinExpr(>, Id(x), Id(y)), StmtBlock([None: Assign(Id(x), BinExpr(-, Id(x), Id(y)))])StmtBlock([None: Assign(Id(y), BinExpr(-, Id(y), Id(x)))]))]))]))
+])
+Refactored AST
+
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+		(0, 0): VarDecl(x_(0, 0), IntegerType, 5),
+		(1, 0): Assign(Id(x_(0, 0)), 5),
+		(0, 2): VarDecl(y_(0, 2), IntegerType, 10),
+		(1, 1): Assign(Id(y_(0, 2)), 10),
+		(0, 4): VarDecl(tmp_(0), IntegerType),
+		(1, 2): Assign(Id(tmp_(0)), BinExpr(!=, Id(x_(0, 0)), Id(y_(0, 2)))),
+		(0, 6): While(Id(tmp_(0)), StmtBlock([
+				(0, 6, 0): VarDecl(tmp_(1), IntegerType),
+				(3, 0): Assign(Id(tmp_(1)), BinExpr(>, Id(x_(0, 0)), Id(y_(0, 2)))),
+				(0, 6, 2): If(Id(tmp_(1)), StmtBlock([
+						(0, 6, 2, 0): VarDecl(tmp_(2), IntegerType),
+						(6, 0): Assign(Id(tmp_(2)), BinExpr(-, Id(x_(0, 0)), Id(y_(0, 2)))),
+						(6, 1): Assign(Id(x_(0, 0)), Id(tmp_(2)))]), StmtBlock([
+						(0, 6, 2, 0): VarDecl(tmp_(3), IntegerType),
+						(7, 0): Assign(Id(tmp_(3)), BinExpr(-, Id(y_(0, 2)), Id(tmp_(2)))),
+						(7, 1): Assign(Id(y_(0, 2)), Id(tmp_(3)))]))]))]))
+])
+
+Symbol Table
+
+Symbol(main, VoidType, (0, 0)),
+Symbol(x_(0, 0), IntegerType, ('main', 0)),
+Symbol(y_(0, 2), IntegerType, ('main', 0)),
+Symbol(tmp_(0), IntegerType, ('main', 0))
+
+CFG
+
+Block(id: 1, name: 0_main, next: cond_2, stmts: [
+	(1, 0): Assign(Id(x_(0, 0)), 5)
+	(1, 1): Assign(Id(y_(0, 2)), 10)
+	(1, 2): Assign(Id(tmp_(0)), BinExpr(!=, Id(x_(0, 0)), Id(y_(0, 2))))
+]),
+Block(id: 2, name: cond, true: loop_3, false: None, cond: Id(tmp_(0))),
+Block(id: 3, name: loop, next: cond_5, stmts: [
+	(3, 0): Assign(Id(tmp_(1)), BinExpr(>, Id(x_(0, 0)), Id(y_(0, 2))))
+]),
+Block(id: 5, name: cond, true: true_branch_6, false: false_branch_7, cond: Id(tmp_(1))),
+Block(id: 6, name: true_branch, next: cond_2, stmts: [
+	(6, 0): Assign(Id(tmp_(2)), BinExpr(-, Id(x_(0, 0)), Id(y_(0, 2))))
+	(6, 1): Assign(Id(x_(0, 0)), Id(tmp_(2)))
+]),
+Block(id: 7, name: false_branch, next: cond_2, stmts: [
+	(7, 0): Assign(Id(tmp_(3)), BinExpr(-, Id(y_(0, 2)), Id(tmp_(2))))
+	(7, 1): Assign(Id(y_(0, 2)), Id(tmp_(3)))
+])

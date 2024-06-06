@@ -80,4 +80,3 @@ class RIG:
         edge.avail = False
 
     return self.nodes[self.num_node]
-    

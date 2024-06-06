@@ -4,10 +4,10 @@ from utils.structures.CFG import *
 
 
 class CFGContext:
-    def __init__(self,  active_block: StmtBlock or None = None, 
-                        loop_block: StmtBlock or None = None, 
-                        endloop_block: StmtBlock or None = None,
-                        func_block : StmtBlock or None = None,
+    def __init__(self,  active_block: Block or None = None, 
+                        loop_block: Block or None = None, 
+                        endloop_block: Block or None = None,
+                        func_block : Block or None = None,
                 ):
         self.active_block = active_block
         self.loop_block = loop_block
@@ -32,12 +32,12 @@ class CFGBuilder(ASTVisitor):
 
         # Remove all VarDecl since ST has been build
         for block in cfg.blocks:
-            if isinstance(block, StmtBlock):
+            if isinstance(block, Block):
                 block.stmts = [stmt for stmt in block.stmts if not isinstance(stmt, VarDecl)]    
 
         # Assign a unique ID to each statement
         for block in cfg.blocks:
-            if isinstance(block, StmtBlock):
+            if isinstance(block, Block):
                 for i in range(len(block.stmts)):
                     block.stmts[i].id = (block.id, i)
             else:
@@ -50,7 +50,7 @@ class CFGBuilder(ASTVisitor):
         ctx = data.ctx
 
         # Create global block and set active
-        global_block = StmtBlock(cfg.get_avail_block_id(), "0")
+        global_block = Block(cfg.get_avail_block_id(), "0")
         cfg.blocks.append(global_block)
         ctx.active_block = global_block
 
@@ -69,7 +69,7 @@ class CFGBuilder(ASTVisitor):
         global_block = ctx.active_block
 
         # Create funcblock and set it active
-        func_block = StmtBlock(cfg.get_avail_block_id(), f"0_{ast.name}")
+        func_block = Block(cfg.get_avail_block_id(), f"0_{ast.name}")
         ctx.active_block = func_block
         cfg.blocks.append(func_block)
 
@@ -106,7 +106,7 @@ class CFGBuilder(ASTVisitor):
         ctx = data.ctx
 
         # Add condition block
-        cond_block = CondBlock(cfg.get_avail_block_id(), "cond", ast.cond)
+        cond_block = Block(cfg.get_avail_block_id(), "cond", ast.cond)
         cfg.blocks.append(cond_block)
         ctx.active_block.next = cond_block
 
@@ -114,7 +114,7 @@ class CFGBuilder(ASTVisitor):
         last_false_active_block = None
 
         # Add true block and visit it
-        true_block = StmtBlock(cfg.get_avail_block_id(), "true_branch")
+        true_block = Block(cfg.get_avail_block_id(), "true_branch")
         cfg.blocks.append(true_block)
         cond_block.true = true_block
         ctx.active_block = true_block
@@ -123,7 +123,7 @@ class CFGBuilder(ASTVisitor):
 
         # Add false block if there is and visit it
         if ast.fstmt is not None:
-            false_block = StmtBlock(cfg.get_avail_block_id(), "false_branch")
+            false_block = Block(cfg.get_avail_block_id(), "false_branch")
             cfg.blocks.append(false_block)
             cond_block.false = false_block
             ctx.active_block = false_block
@@ -131,7 +131,7 @@ class CFGBuilder(ASTVisitor):
             last_false_active_block = ctx.active_block
 
         # Create endif_block
-        end_block = StmtBlock(cfg.get_avail_block_id(), "endif")
+        end_block = Block(cfg.get_avail_block_id(), "endif")
         cfg.blocks.append(end_block)
 
         last_true_active_block.next = end_block
@@ -149,9 +149,9 @@ class CFGBuilder(ASTVisitor):
         ctx = data.ctx
 
         # Create cond, loop and endloop
-        cond_block = CondBlock(cfg.get_avail_block_id(), "cond", ast.cond)
-        loop_block = StmtBlock(cfg.get_avail_block_id(), "loop")
-        endloop_block = StmtBlock(cfg.get_avail_block_id(), "endloop")
+        cond_block = Block(cfg.get_avail_block_id(), "cond", ast.cond)
+        loop_block = Block(cfg.get_avail_block_id(), "loop")
+        endloop_block = Block(cfg.get_avail_block_id(), "endloop")
 
         cfg.blocks.append(cond_block)
         cfg.blocks.append(loop_block)
@@ -181,9 +181,9 @@ class CFGBuilder(ASTVisitor):
         ctx = data.ctx
 
         # Create loop, cond and endloop
-        loop_block = StmtBlock(cfg.get_avail_block_id(), "loop")
-        cond_block = CondBlock(cfg.get_avail_block_id(), "cond", ast.cond)
-        endloop_block = StmtBlock(cfg.get_avail_block_id(), "endloop")
+        loop_block = Block(cfg.get_avail_block_id(), "loop")
+        cond_block = Block(cfg.get_avail_block_id(), "cond", ast.cond)
+        endloop_block = Block(cfg.get_avail_block_id(), "endloop")
 
         cfg.blocks.append(loop_block)
         cfg.blocks.append(cond_block)
@@ -227,7 +227,7 @@ class CFGBuilder(ASTVisitor):
 
         ctx.active_block.jump = cfg.find_func_block(ast.name)
 
-        link_block = StmtBlock(cfg.get_avail_block_id(), f"{ast.name}_link")
+        link_block = Block(cfg.get_avail_block_id(), f"{ast.name}_link")
         cfg.append_block(link_block)
         ctx.active_block.jump = link_block
 
@@ -240,7 +240,7 @@ class CFGBuilder(ASTVisitor):
 
         ctx.active_block.jump = cfg.find_func_block(ast.name)
 
-        link_block = StmtBlock(cfg.get_avail_block_id(), f"{ast.name}_link")
+        link_block = Block(cfg.get_avail_block_id(), f"{ast.name}_link")
         cfg.append_block(link_block)
         ctx.active_block.jump = link_block
 

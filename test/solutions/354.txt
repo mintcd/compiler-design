@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(test, IntegerType, [], None, BlockStmt([DoWhileStmt(BinExpr(<, Id(a), UnExpr(-, IntegerLit(2))), BlockStmt([DoWhileStmt(BinExpr(>=, Id(a), Id(abc)), BlockStmt([]))]))]))
-])

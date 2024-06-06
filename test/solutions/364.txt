@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(main, VoidType, [Param(a, IntegerType)], None, BlockStmt([AssignStmt(Id(test), BinExpr(-, ArrayCell(arr, [BinExpr(+, IntegerLit(1), FuncCall(foo, []))]), ArrayCell(arr, [BinExpr(+, IntegerLit(1), ArrayCell(arr, [IntegerLit(1)]))])))]))
-])

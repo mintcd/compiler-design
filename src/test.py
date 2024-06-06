@@ -1,21 +1,17 @@
 from parsing.parse import parse
 from utils.builders.CFGBuilder import CFGBuilder
 from optimization.refactorers import ASTRefactorer, CFGRefactorer
-from optimization.local_optimizers import AlgebraicSimplifier
-from utils.builders.LivelinessGenerator import LivelinessGenerator
-from optimization.RegisterAllocator import RegisterAllocator
-from utils.builders.SymbolTableBuilder import SymbolTableBuilder
+
 from code_generation.CodeGenerator import CodeGenerator
 
 import json
 
 data = '''
 main : function void() {
-  a,b,c,d,e : integer = 1,2,3,4,5;
-  if (a > b) {
-    c : integer;
-    c = a;
-  }
+  x,y,z : integer;
+  x = y;
+  y = z;
+  z = x;
 }'''
 
 ast = parse(data)
@@ -24,7 +20,7 @@ ast = parse(data)
 
 # print(23, st)
 
-code = CodeGenerator(ast, 4).generate()
+code = CodeGenerator(ast, 4, 'log.log').generate()
 
 # print(code)
 

@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(main, VoidType, [], None, BlockStmt([VarDecl(a, AutoType, IntegerLit(1)), VarDecl(b, AutoType, StringLit(Hell)), VarDecl(c, AutoType, ArrayLit([ArrayLit([IntegerLit(1), IntegerLit(2)]), ArrayLit([IntegerLit(21), IntegerLit(7)]), ArrayLit([IntegerLit(16), IntegerLit(4)])]))]))
-])

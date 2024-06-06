@@ -124,7 +124,7 @@ class Parser:
         '''
 
         if len(p) == 4:
-            if p[1] == '(' and p[3] == ')': 
+            if p.slice[1].type == 'LP': 
                 p[0] = p[2]
             else:
                 p[0] = BinExpr(p[2], p[1], p[3])

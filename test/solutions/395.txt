@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(main, IntegerType, [Param(a, IntegerType), Param(v, IntegerType)], None, BlockStmt([IfStmt(BinExpr(<, BinExpr(+, Id(a), Id(b)), BinExpr(/, BinExpr(*, IntegerLit(1), IntegerLit(3)), IntegerLit(7))), BlockStmt([VarDecl(c, ArrayType([4], IntegerType)), VarDecl(a, IntegerType), IfStmt(UnExpr(!, BinExpr(-, Id(a), Id(b))), ReturnStmt(IntegerLit(0)), BlockStmt([]))]), ReturnStmt(IntegerLit(10)))]))
-])

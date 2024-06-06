@@ -1,3 +1,0 @@
-Program([
-	FuncDecl(main, VoidType, [], None, BlockStmt([AssignStmt(Id(a), BinExpr(/, BinExpr(*, IntegerLit(2), BinExpr(+, UnExpr(-, IntegerLit(3)), Id(f))), BinExpr(%, IntegerLit(2), IntegerLit(5))))]))
-])

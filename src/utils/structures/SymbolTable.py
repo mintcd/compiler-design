@@ -75,18 +75,12 @@ class SymbolTable:
 
         return self
     
-    def get_symbol(self, name: str, scope: tuple or None = None):
-        res = list()
+    def get_symbol(self, name: str):
         for symbol in self.symbols:
             if symbol.name == name:
-                res.append(symbol)
-        
-        if scope is None:
-            return res
-
-        for symbol in res:
-            if symbol.scope == scope:
                 return symbol
+        
+        return None
     
     def type_inference(self, name, typ):
         symbol = self.find_symbol(name)

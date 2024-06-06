@@ -1,31 +1,13 @@
-from utils.visitors import ASTVisitor, CFGVisitor
+from utils.visitors import CFGVisitor
 from utils.structures.CFG import CFG, Block
-from utils.structures.AST import *
-from typing import List
 
-from optimization.ast_refactorer.BinExprUnwrapper import BinExprUnwrapper
-from optimization.ast_refactorer.ScopeJustifier import ScopeJustifier
-from optimization.ast_refactorer.VarDeclUnwrapper import VarDeclUnwrapper
-from optimization.ast_refactorer.ForToWhile import ForToWhile
+from optimization.ast_refactor.BinExprUnwrapper import BinExprUnwrapper
+from optimization.ast_refactor.ScopeJustifier import ScopeJustifier
+from optimization.ast_refactor.VarDeclUnwrapper import VarDeclUnwrapper
+from optimization.ast_refactor.ForToWhile import ForToWhile
+from optimization.ast_refactor.InforAssigner import InforAssigner
 
-
-class ASTRefactorerContext:
-  def __init__(self, last_expr : int or None = None):
-    self.last_expr : Expr = last_expr
-    self.used_sym = 0
-
-    self.current_block: Block or None = None
-    self.stmt_id = 0
-    self.current_stmt: Stmt or None = None
-
-    self.current_id = [0]
-
-class ASTRefactorerData:
-  def __init__(self, obj : Program, ctx : ASTRefactorerContext):
-    self.obj = obj
-    self.ctx = ctx
-
-class ASTRefactorer(ASTVisitor):
+class ASTRefactorer:
 
     '''
       1) Assign a unique id to each stmt
@@ -36,19 +18,20 @@ class ASTRefactorer(ASTVisitor):
       6) Unwrap BinExpr
     '''
 
-    def __init__(self, ast : Program):
+    def __init__(self, ast):
         self.ast = ast
 
     def refactor(self):
         ast = VarDeclUnwrapper(self.ast).unwrap()
         ast = ScopeJustifier(ast).justify()
         ast = ForToWhile(ast).refactor()
-        ast = BinExprUnwrapper(ast).refactor()
+        ast = BinExprUnwrapper(ast).unwrap()
+        ast = InforAssigner(ast).assign()
         return ast
 
 class CFGRefactorer(CFGVisitor):
   '''
-  Remove all empty StmtBlock
+  Remove empty StmtBlocks
   '''
   def __init__(self, cfg : CFG):
     self.cfg = cfg
@@ -58,21 +41,21 @@ class CFGRefactorer(CFGVisitor):
 
   def visitCFG(self, cfg : CFG, data):
     for block in cfg.blocks:
-      if isinstance(block, AssignStmt) and len(block.stmts) == 0:
+      if block.cond is None and len(block.stmts) == 0:
         for another_block in cfg.blocks:
           if another_block.id != block.id:
-            if another_block.jump.id == block.id:
+            if another_block.jump == block:
               another_block.jump = block.next
-            if another_block.link.id == block.id:
+            if another_block.link == block:
               another_block.link = block.next
               
-            if isinstance(another_block, StmtBlock):
-              if another_block.next.id == block.id:
+            if another_block.cond is None:
+              if another_block.next == block:
                 another_block.next = block.next
             else:
-              if another_block.true.id == block.id:
+              if another_block.true == block:
                 another_block.true = block.next
-              if another_block.false.id == block.id:
+              if another_block.false == block:
                 another_block.false = block.next
-      cfg.blocks.remove(block)
+        cfg.blocks.remove(block)
     return cfg

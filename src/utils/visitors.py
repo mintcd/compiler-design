@@ -99,7 +99,7 @@ class ASTVisitor(Visitor):
     def visitParamDecl(self, ast, data : Data):
         return data
 
-    def visitStmtBlock(self, ast : Block, data : Data): 
+    def visitBlockStmt(self, ast : Block, data : Data): 
         return data
     
     def visitFuncDecl(self, ast, data : Data):
@@ -117,7 +117,8 @@ class CFGVisitor(Visitor):
     def visitBlock(self, cfg : Block, data):
         return data
 
-    def visitAssignStmt(self, cfg : AssignStmt, data): return data
+    def visitAssignStmt(self, cfg : AssignStmt, data): 
+        return data
 
     
     def visitVarDecl(self, cfg : VarDecl, data):

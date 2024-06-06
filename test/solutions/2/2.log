@@ -1,0 +1,89 @@
+Original AST
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([None: VarDecl(a, IntegerType, 1),
+None: VarDecl(b, IntegerType, 2),
+None: VarDecl(c, IntegerType, 3),
+None: VarDecl(d, IntegerType, 4),
+None: VarDecl(e, IntegerType, 5),
+None: VarDecl(f, IntegerType, 6),
+None: Assign(Id(a), BinExpr(+, Id(b), Id(c))),
+None: Assign(Id(d), UnExpr(-, Id(a))),
+None: Assign(Id(e), Id(f))]))
+])
+--------------------------------------------------------
+
+Refactored AST
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([(0, 0): VarDecl(a_(0, 0), IntegerType, 1),
+(0, 1): Assign(Id(a_(0, 0)), 1),
+(0, 2): VarDecl(b_(0, 2), IntegerType, 2),
+(0, 3): Assign(Id(b_(0, 2)), 2),
+(0, 4): VarDecl(c_(0, 4), IntegerType, 3),
+(0, 5): Assign(Id(c_(0, 4)), 3),
+(0, 6): VarDecl(d_(0, 6), IntegerType, 4),
+(0, 7): Assign(Id(d_(0, 6)), 4),
+(0, 8): VarDecl(e_(0, 8), IntegerType, 5),
+(0, 9): Assign(Id(e_(0, 8)), 5),
+(0, 10): VarDecl(f_(0, 10), IntegerType, 6),
+(0, 11): Assign(Id(f_(0, 10)), 6),
+(0, 12): VarDecl(tmp_(0), IntegerType),
+(0, 13): Assign(Id(tmp_(0)), BinExpr(+, Id(b_(0, 2)), Id(c_(0, 4)))),
+(0, 14): Assign(Id(a_(0, 0)), Id(tmp_(0))),
+(0, 15): VarDecl(tmp_(1), IntegerType),
+(0, 16): Assign(Id(tmp_(1)), UnExpr(-, Id(a_(0, 0)))),
+(0, 17): Assign(Id(d_(0, 6)), Id(tmp_(1))),
+(0, 18): Assign(Id(e_(0, 8)), Id(f_(0, 10)))]))
+])
+
+--------------------------------------------------------
+
+Symbol Table
+
+Symbol(main, VoidType, (0, 0)),
+Symbol(a_(0, 0), IntegerType, ('main', 0)),
+Symbol(b_(0, 2), IntegerType, ('main', 0)),
+Symbol(c_(0, 4), IntegerType, ('main', 0)),
+Symbol(d_(0, 6), IntegerType, ('main', 0)),
+Symbol(e_(0, 8), IntegerType, ('main', 0)),
+Symbol(f_(0, 10), IntegerType, ('main', 0)),
+Symbol(tmp_(0), IntegerType, ('main', 0)),
+Symbol(tmp_(1), IntegerType, ('main', 0))
+
+--------------------------------------------------------
+
+CFG
+Block(id: 1, name: 0_main, next: None, stmts: [
+	(1, 0): Assign(Id(a_(0, 0)), 1)
+	(1, 1): Assign(Id(b_(0, 2)), 2)
+	(1, 2): Assign(Id(c_(0, 4)), 3)
+	(1, 3): Assign(Id(d_(0, 6)), 4)
+	(1, 4): Assign(Id(e_(0, 8)), 5)
+	(1, 5): Assign(Id(f_(0, 10)), 6)
+	(1, 6): Assign(Id(tmp_(0)), BinExpr(+, Id(b_(0, 2)), Id(c_(0, 4))))
+	(1, 7): Assign(Id(a_(0, 0)), Id(tmp_(0)))
+	(1, 8): Assign(Id(tmp_(1)), UnExpr(-, Id(tmp_(0))))
+	(1, 9): Assign(Id(d_(0, 6)), Id(tmp_(1)))
+	(1, 10): Assign(Id(e_(0, 8)), Id(f_(0, 10)))
+]
+--------------------------------------------------------
+
+Live symbols after each statement:
+{
+	(1, 0): [],
+	(1, 1): ['b_(0, 2)'],
+	(1, 2): ['b_(0, 2)', 'c_(0, 4)'],
+	(1, 3): ['b_(0, 2)', 'c_(0, 4)'],
+	(1, 4): ['b_(0, 2)', 'c_(0, 4)'],
+	(1, 5): ['c_(0, 4)', 'b_(0, 2)', 'f_(0, 10)'],
+	(1, 6): ['tmp_(0)', 'f_(0, 10)'],
+	(1, 7): ['tmp_(0)', 'f_(0, 10)'],
+	(1, 8): ['tmp_(1)', 'f_(0, 10)'],
+	(1, 9): ['f_(0, 10)'],
+	(1, 10): []
+}
+----------------------------------------
+
+Register allocation for symbols
+
+{'b_(0, 2)': '$tspill', 'c_(0, 4)': '$t0', 'f_(0, 10)': '$t0', 'tmp_(0)': '$t0', 'tmp_(1)': '$t0'}
+--------------------------------------------------------
