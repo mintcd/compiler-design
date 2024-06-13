@@ -1,4 +1,4 @@
-Compiler design, specialized for MT22-to-MIPS
+Compiler design, specialized for MT22-to-MIPS. See further details at 
 
 Usage: with compiler-design/test/testcases/file_name
 

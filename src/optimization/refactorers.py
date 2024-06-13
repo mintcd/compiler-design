@@ -1,5 +1,26 @@
-from utils.visitors import CFGVisitor
-from utils.structures.CFG import CFG, Block
+'''
+  The interfaces to call elemental refactors.
+
+  1) ASTRefactorer:
+      VarDeclUnwrapper: unwrap VarDecl(x, typ, init) to [VarDecl(x, typ), Assign(x, init)]
+      ScopeJustifier: Rename similar-name symbol with respect to the actual scope. Example: 
+        {                         {
+          x = 0;                    x_0 = 0;
+          {                         {
+            x = 1;       ---->        x_1 = 1;
+          }                         }
+        }                         }
+      ForToWhile: Turn all ForStmt to WhileStmt
+      BinExprUnwrapper: Unwrap complex binary expressions to single ones. Example:
+      a = b + c + d      ---->    tmp_0 = b + c
+                                  tmp_1 = tmp_0 + d
+                                  a = tmp_1
+  
+  2) CFGRefactorer:
+      EmptyBlockRemover
+      LocalOptimizer
+      GlobalOptimizer
+'''
 
 from optimization.ast_refactor.BinExprUnwrapper import BinExprUnwrapper
 from optimization.ast_refactor.ScopeJustifier import ScopeJustifier
@@ -7,17 +28,9 @@ from optimization.ast_refactor.VarDeclUnwrapper import VarDeclUnwrapper
 from optimization.ast_refactor.ForToWhile import ForToWhile
 from optimization.ast_refactor.InforAssigner import InforAssigner
 
+from optimization.cfg_refactor.EmptyBlockRemover import EmptyBlockRemover
+
 class ASTRefactorer:
-
-    '''
-      1) Assign a unique id to each stmt
-      2) Eliminates dead code after Return.
-      3) Turns Stmt used in IfStmt, WhileStmt and ForStmt to Block
-      4) Turn initiated vardecl to assignstmt with infered type
-      5) Turn For to While
-      6) Unwrap BinExpr
-    '''
-
     def __init__(self, ast):
         self.ast = ast
 
@@ -30,32 +43,10 @@ class ASTRefactorer:
         return ast
 
 class CFGRefactorer(CFGVisitor):
-  '''
-  Remove empty StmtBlocks
-  '''
   def __init__(self, cfg : CFG):
     self.cfg = cfg
 
   def refactor(self):
-    return self.visit(self.cfg, None)
+    cfg = EmptyBlockRemover(self.cfg).remove()
 
-  def visitCFG(self, cfg : CFG, data):
-    for block in cfg.blocks:
-      if block.cond is None and len(block.stmts) == 0:
-        for another_block in cfg.blocks:
-          if another_block.id != block.id:
-            if another_block.jump == block:
-              another_block.jump = block.next
-            if another_block.link == block:
-              another_block.link = block.next
-              
-            if another_block.cond is None:
-              if another_block.next == block:
-                another_block.next = block.next
-            else:
-              if another_block.true == block:
-                another_block.true = block.next
-              if another_block.false == block:
-                another_block.false = block.next
-        cfg.blocks.remove(block)
     return cfg
