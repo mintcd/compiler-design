@@ -1,3 +1,6 @@
 {"rule":"EN_CONTRACTION_SPELLING","sentence":"^\\QLocal Optimizer includes Copy Propagation: whenever there is AssignStmt(Id(x), Id(y))\\E$"}
 {"rule":"EN_CONTRACTION_SPELLING","sentence":"^\\QLocal Optimizer includes Copy Propagation: whenever there is AssignStmt(Id(x), Id(y)), replace all future usages of \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q by \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
 {"rule":"EN_CONTRACTION_SPELLING","sentence":"^\\QTurn an initiated variable declaration VarDecl(name, type, value) into an uninitiated declaration VarDecl(name, type) and an assignment AssignStmt(Id(name), value)\\E$"}
+{"rule":"WHITESPACE_RULE","sentence":"^\\QStep            Ouput\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QStep            Ouput\\E$"}
+{"rule":"ENGLISH_WORD_REPEAT_RULE","sentence":"^\\QLexing                 tokens\nParsing                ast\nAST Optimization       ast\\E$"}

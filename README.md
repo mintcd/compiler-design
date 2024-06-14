@@ -1,4 +1,4 @@
-Compiler design, specialized for MT22-to-MIPS. See further details at 
+Compiler design, specialized for MT22-to-MIPS. See further details at https://mintcd.github.io/computer-science/compiler-design
 
 Usage: with compiler-design/test/testcases/file_name
 

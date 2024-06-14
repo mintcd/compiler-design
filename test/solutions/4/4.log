@@ -1,0 +1,122 @@
+AST after unwrapping VarDecls
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: IntegerType,
+(0, 1) Id(a) := 1,
+(0, 2) b: IntegerType,
+(0, 3) Id(b) := 2,
+(0, 4) c: IntegerType,
+(0, 5) Id(c) := 3,
+(0, 6) d: IntegerType,
+(0, 7) Id(d) := 4,
+(0, 8) Id(a) := BinExpr(+, BinExpr(+, Id(b), Id(c)), Id(d))
+]))
+])
+
+--------------------------------------------------------
+
+AST after changing ForStmts to WhileStmts
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: IntegerType,
+(0, 1) Id(a) := 1,
+(0, 2) b: IntegerType,
+(0, 3) Id(b) := 2,
+(0, 4) c: IntegerType,
+(0, 5) Id(c) := 3,
+(0, 6) d: IntegerType,
+(0, 7) Id(d) := 4,
+(0, 8) Id(a) := BinExpr(+, BinExpr(+, Id(b), Id(c)), Id(d))
+]))
+])
+
+--------------------------------------------------------
+
+Symbol Table
+Symbol(0, main, VoidType, 0),
+Symbol(2, a, IntegerType, (0,)),
+Symbol(4, b, IntegerType, (0,)),
+Symbol(6, c, IntegerType, (0,)),
+Symbol(8, d, IntegerType, (0,))
+
+--------------------------------------------------------
+
+AST after justifying symbol scope
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: IntegerType,
+(0, 1) Id(a, 2) := 1,
+(0, 2) b: IntegerType,
+(0, 3) Id(b, 4) := 2,
+(0, 4) c: IntegerType,
+(0, 5) Id(c, 6) := 3,
+(0, 6) d: IntegerType,
+(0, 7) Id(d, 8) := 4,
+(0, 8) Id(a, 2) := BinExpr(+, BinExpr(+, Id(b, 4), Id(c, 6)), Id(d, 8))
+]))
+])
+
+--------------------------------------------------------
+
+AST after unwrapping BinExprs
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: IntegerType,
+(0, 1) Id(a, 2) := 1,
+(0, 2) b: IntegerType,
+(0, 3) Id(b, 4) := 2,
+(0, 4) c: IntegerType,
+(0, 5) Id(c, 6) := 3,
+(0, 6) d: IntegerType,
+(0, 7) Id(d, 8) := 4,
+(0, 8) unwrapping_id_(0): IntegerType,
+(0, 9) Id(unwrapping_id_(0)) := BinExpr(+, Id(b, 4), Id(c, 6)),
+(0, 10) unwrapping_id_(1): IntegerType,
+(0, 11) Id(unwrapping_id_(1)) := BinExpr(+, Id(unwrapping_id_(0)), Id(d, 8)),
+(0, 12) Id(a, 2) := Id(unwrapping_id_(1))
+]))
+])
+
+--------------------------------------------------------
+
+Symbol Table
+Symbol(0, main, VoidType, 0),
+Symbol(2, a, IntegerType, (0,)),
+Symbol(4, b, IntegerType, (0,)),
+Symbol(6, c, IntegerType, (0,)),
+Symbol(8, d, IntegerType, (0,)),
+Symbol(10, unwrapping_id_(0), IntegerType, (0,)),
+Symbol(12, unwrapping_id_(1), IntegerType, (0,))
+
+--------------------------------------------------------
+
+CFG
+Block(id: 0, name: 0, next: 0_main_1, [],
+Block(id: 1, name: 0_main, next: None, stmts: [
+	(1, 0) Id(a, 2) := 1
+	(1, 1) Id(b, 4) := 2
+	(1, 2) Id(c, 6) := 3
+	(1, 3) Id(d, 8) := 4
+	(1, 4) Id(unwrapping_id_(0)) := BinExpr(+, Id(b, 4), Id(c, 6))
+	(1, 5) Id(unwrapping_id_(1)) := BinExpr(+, Id(unwrapping_id_(0)), Id(d, 8))
+	(1, 6) Id(a, 2) := Id(unwrapping_id_(1))
+]
+
+--------------------------------------------------------
+
+Live symbols after each statement:
+{
+	(1, 0): [],
+	(1, 1): [Symbol(b, IntegerType, (0,))],
+	(1, 2): [Symbol(b, IntegerType, (0,)), Symbol(c, IntegerType, (0,))],
+	(1, 3): [Symbol(d, IntegerType, (0,)), Symbol(b, IntegerType, (0,)), Symbol(c, IntegerType, (0,))],
+	(1, 4): [Symbol(d, IntegerType, (0,)), Symbol(unwrapping_id_(0), IntegerType, (0,))],
+	(1, 5): [Symbol(unwrapping_id_(1), IntegerType, (0,))],
+	(1, 6): []
+}
+----------------------------------------
+
+Register allocation for symbols
+
+{Symbol(d, IntegerType, (0,)): '$t0', Symbol(b, IntegerType, (0,)): '$t2', Symbol(c, IntegerType, (0,)): '$t0', Symbol(unwrapping_id_(0), IntegerType, (0,)): '$t0', Symbol(unwrapping_id_(1), IntegerType, (0,)): '$t0'}
+--------------------------------------------------------

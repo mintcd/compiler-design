@@ -1,0 +1,143 @@
+AST after unwrapping VarDecls
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: ArrayType([5], IntegerType),
+None Id(a) := Array([5, 4, 3, 2, 1]),
+(0, 1) tmp: IntegerType,
+(0, 2): ForStmt(None Id(i) := 0.0, BinExpr(<, Id(i), 4), BinExpr(+, Id(i), 1), StmtBlock([
+(0, 2, 0): ForStmt(None Id(j) := BinExpr(+, Id(i), 1), BinExpr(<, Id(j), 5), BinExpr(+, Id(j), 1), StmtBlock([
+(0, 2, 0, 0): If(BinExpr(>, ArrayCell(a, [Id(i)], ArrayCell(a, [Id(j)]), StmtBlock([
+(0, 2, 0, 0, 0) Id(tmp) := ArrayCell(a, [Id(i)]
+])),
+(0, 2, 0, 1) ArrayCell(a, [Id(i)] := ArrayCell(a, [Id(j)],
+(0, 2, 0, 2) ArrayCell(a, [Id(j)] := Id(tmp)
+]))
+]))
+]))
+])
+
+--------------------------------------------------------
+
+AST after changing ForStmts to WhileStmts
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: ArrayType([5], IntegerType),
+(0, 1) Id(a) := Array([5, 4, 3, 2, 1]),
+(0, 2) tmp: IntegerType,
+(0, 3) i: IntegerType,
+(0, 4) Id(i) := 0.0,
+(0, 5): While(BinExpr(<, Id(i), 4), StmtBlock([
+(0, 5, 0) j: IntegerType,
+(0, 5, 1) Id(j) := BinExpr(+, Id(i), 1),
+(0, 5, 2): While(BinExpr(<, Id(j), 5), StmtBlock([
+(0, 5, 2, 0): If(BinExpr(>, ArrayCell(a, [Id(i)], ArrayCell(a, [Id(j)]), StmtBlock([
+(0, 5, 2, 0, 0) Id(tmp) := ArrayCell(a, [Id(i)]
+])),
+(0, 5, 2, 1) ArrayCell(a, [Id(i)] := ArrayCell(a, [Id(j)],
+(0, 5, 2, 2) ArrayCell(a, [Id(j)] := Id(tmp),
+(0, 5, 2, 3) Id(j) := BinExpr(+, Id(j), 1)
+])),
+(0, 5, 3) Id(i) := BinExpr(+, Id(i), 1)
+]))
+]))
+])
+
+--------------------------------------------------------
+
+Symbol Table
+Symbol(main, VoidType, 0),
+Symbol(a, ArrayType([5], IntegerType), (0,)),
+Symbol(tmp, IntegerType, (0,)),
+Symbol(i, IntegerType, (0,)),
+Symbol(j, IntegerType, (0, 5))
+
+--------------------------------------------------------
+
+AST after justifying symbol scope
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: ArrayType([5], IntegerType),
+(0, 1) Id(a, 2) := Array([5, 4, 3, 2, 1]),
+(0, 2) tmp: IntegerType,
+(0, 3) i: IntegerType,
+(0, 4) Id(i, 6) := 0.0,
+(0, 5): While(BinExpr(<, Id(i, 6), 4), StmtBlock([
+(0, 5, 0) j: IntegerType,
+(0, 5, 1) Id(j, 8) := BinExpr(+, Id(i, 6), 1),
+(0, 5, 2): While(BinExpr(<, Id(j, 8), 5), StmtBlock([
+(0, 5, 2, 0): If(BinExpr(>, ArrayCell(a, 2, [Id(i, 6)], ArrayCell(a, 2, [Id(j, 8)]), StmtBlock([
+(0, 5, 2, 0, 0) Id(tmp, 4) := ArrayCell(a, 2, [Id(i, 6)]
+])),
+(0, 5, 2, 1) ArrayCell(a, 2, [Id(i, 6)] := ArrayCell(a, 2, [Id(j, 8)],
+(0, 5, 2, 2) ArrayCell(a, 2, [Id(j, 8)] := Id(tmp, 4),
+(0, 5, 2, 3) Id(j, 8) := BinExpr(+, Id(j, 8), 1)
+])),
+(0, 5, 3) Id(i, 6) := BinExpr(+, Id(i, 6), 1)
+]))
+]))
+])
+
+--------------------------------------------------------
+
+AST after unwrapping BinExprs
+Program([
+	FuncDecl(main, VoidType, [], None, StmtBlock([
+(0, 0) a: ArrayType([5], IntegerType),
+(0, 1) Id(a, 2) := Array([5, 4, 3, 2, 1]),
+(0, 2) tmp: IntegerType,
+(0, 3) i: IntegerType,
+(0, 4) Id(i, 6) := 0.0,
+(0, 5): While(Id(unwrapping_id_(0)), StmtBlock([
+(0, 5, 0) j: IntegerType,
+(0, 5, 1) Id(j, 8) := Id(unwrapping_id_(1)),
+(0, 5, 2): While(Id(unwrapping_id_(2)), StmtBlock([
+(0, 5, 2, 0): If(Id(unwrapping_id_(3)), StmtBlock([
+(0, 5, 2, 0, 0) Id(tmp, 4) := ArrayCell(a, 2, [Id(i, 6)]
+])),
+(0, 5, 2, 1) ArrayCell(a, 2, [Id(i, 6)] := ArrayCell(a, 2, [Id(j, 8)],
+(0, 5, 2, 2) ArrayCell(a, 2, [Id(j, 8)] := Id(tmp, 4),
+(0, 5, 2, 3) Id(j, 8) := Id(unwrapping_id_(4))
+])),
+(0, 5, 3) Id(i, 6) := Id(unwrapping_id_(5))
+]))
+]))
+])
+
+--------------------------------------------------------
+
+Symbol Table
+Symbol(main, VoidType, 0),
+Symbol(a, ArrayType([5], IntegerType), (0,)),
+Symbol(tmp, IntegerType, (0,)),
+Symbol(i, IntegerType, (0,)),
+Symbol(j, IntegerType, (0, 5))
+
+--------------------------------------------------------
+
+CFG
+Block(id: 0, name: 0, next: 0_main_1, [],
+Block(id: 1, name: 0_main, next: cond_2, stmts: [
+	(1, 0) Id(a, 2) := Array([5, 4, 3, 2, 1])
+	(1, 1) Id(i, 6) := 0.0
+],
+Block(id: 2, name: cond, next: unwrapping_id_(0)_None, [],
+Block(id: 3, name: loop, next: cond_5, stmts: [
+	(3, 0) Id(j, 8) := Id(unwrapping_id_(1))
+],
+Block(id: 4, name: endloop, next: None, [],
+Block(id: 5, name: cond, next: unwrapping_id_(2)_None, [],
+Block(id: 6, name: loop, next: cond_8, [],
+Block(id: 7, name: endloop, next: None, [],
+Block(id: 8, name: cond, next: unwrapping_id_(3)_None, [],
+Block(id: 9, name: true_branch, next: endif_10, stmts: [
+	(9, 0) Id(tmp, 4) := ArrayCell(a, 2, [Id(i, 6)]
+],
+Block(id: 10, name: endif, next: cond_2, stmts: [
+	(10, 0) ArrayCell(a, 2, [Id(i, 6)] := ArrayCell(a, 2, [Id(j, 8)]
+	(10, 1) ArrayCell(a, 2, [Id(j, 8)] := Id(tmp, 4)
+	(10, 2) Id(j, 8) := Id(unwrapping_id_(4))
+	(10, 3) Id(i, 6) := Id(unwrapping_id_(5))
+]
+
+--------------------------------------------------------
+

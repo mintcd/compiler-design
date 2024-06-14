@@ -140,11 +140,11 @@ class CFG(Visitee):
             else:
                 succ_blocks = stmt_block.get_successors()
                 for succ_block in succ_blocks:
-                    res.append(succ_block.get_fisrt_stmt())
+                    res.append(succ_block.get_first_child())
         else:
             succ_blocks = stmt_block.get_successors()
             for succ_block in succ_blocks:
-                res.append(succ_block.get_fisrt_stmt())
+                res.append(succ_block.get_first_child())
         return res
 
     def append_block(self, block : Block):

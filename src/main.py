@@ -1,48 +1,10 @@
-import sys
-import os
+import sys, os
 import argparse
-from lexing.Lexer import Lexer
-from parsing.Parser import Parser
-from code_generation.CodeGenerator import CodeGenerator
-from optimization.refactorers import ASTRefactorer
+from APIs import *
 
 src_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.path.dirname(src_path)
 testcase_dir = os.path.join(project_path, "test/testcases")
-
-
-def lex(data):
-    lexer = Lexer()
-    lexer.input(data)
-
-    tokens = [token for token in lexer.Lexer]
-
-    return tokens
-
-
-def parse(data):
-    lexer = Lexer()
-    parser = Parser()
-
-    ast = ASTRefactorer(parser.parse(data)).refactor()
-
-    return ast
-
-def gen(data, num_reg, log_file):
-    lexer = Lexer()
-    parser = Parser()
-
-    ast = parser.parse(data)
-    
-    with open(log_file, 'w') as file:
-        file.write("Original AST\n")
-        file.write(f"{str(ast)}\n")
-        file.write("--------------------------------------------------------\n\n")
-
-    code = CodeGenerator(ast, num_reg, log_file).generate()
-
-    return code
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -61,7 +23,7 @@ def main():
     args = parser.parse_args()
 
     with open(os.path.join(testcase_dir, args.file_name), 'r') as file:
-        data = file.read()
+        src_program = file.read()
 
     solution_dir = os.path.join(project_path, "test/solutions", args.file_name.split('.')[0])
 
@@ -73,22 +35,36 @@ def main():
     solution = ""
 
     if args.command == 'lex':
-        solution = lex(data)
+        solution = lex(src_program, log_file)
     elif args.command == 'parse':
-        solution = parse(data)
+        solution = parse(src_program, log_file)
     elif args.command == 'codegen':
-        num_reg = args.num_reg
-        solution = gen(data, int(num_reg), log_file)
+        with open(log_file, 'w') as file:
+            file.write('')
+
+        num_reg = int(args.num_reg)
+        ast = parse(src_program, log_file)
+        ast = optimize_ast(ast, log_file)
+
+        st = build_symbol_table(ast, log_file)
+        ast = remove_vardecls(ast, log_file)
+
+        cfg = build_cfg(ast, log_file)
+
+        cfg = optimize_cfg(cfg, log_file)
+        code = generate_code(cfg, num_reg, st, log_file)
+
+        with open(os.path.join(solution_dir, f"{args.file_name.split('.')[0]}.asm"), 'w') as file:
+            file.write(str(code))
+
+        print(f"Find solution in test/solutions/{args.file_name.split('.')[0]}/{args.file_name.split('.')[0]}.asm")
     else:
         print("Usage: with compiler-design/test/testcases/file_name")
         print("python main.py lex file_name")
         print("python main.py parse file_name")
         print("python main.py codegen file_name reg_num")
 
-    with open(os.path.join(solution_dir, f"{args.file_name.split('.')[0]}.asm"), 'w') as file:
-        file.write(str(solution))
 
-    print(f"Find solution in test/solutions/{args.file_name.split('.')[0]}/{args.file_name.split('.')[0]}.asm")
 
 
 if __name__ == "__main__":

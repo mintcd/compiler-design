@@ -11,7 +11,7 @@ class StmtBlock(AST):
         self.stmts = stmts
 
     def __repr__(self):
-        return "StmtBlock([{}])".format(",\n".join([str(stmt) for stmt in self.stmts]))
+        return "StmtBlock([\n{}\n])".format(",\n".join([str(stmt) for stmt in self.stmts]))
     
     def get_index_of_stmt(self, stmt):
         for i in range(len(self.stmts)):
@@ -28,9 +28,7 @@ class Stmt(AST):
     def __init__(self, _id: Tuple[int] or None = None, block: StmtBlock or None = None):
         self.id = _id if _id is not None else None
         self.block = block if block is not None else None
-class Expr(AST): 
-    def __init__(self, stmt: Stmt or None = None):
-        self.stmt = stmt
+class Expr(AST): pass
 class Type(AST): pass
 class Decl(AST): pass
 
@@ -47,7 +45,8 @@ class AtomicLiteral(Expr): pass
 
 class LHS(Expr):
     def __init__(self):
-        super().__init__()   
+        super().__init__()
+        self.id = None  
 
 class BinExpr(Expr):
     def __init__(self, op: str, left: Expr, right: Expr):
@@ -110,7 +109,7 @@ class ArrayCell(LHS):
         self.name = name
         self.cell = cell
     def __repr__(self):
-        return "ArrayCell({}, [{}])".format(self.name, ", ".join([str(expr) for expr in self.cell]))
+        return f"ArrayCell({self.name}{(', ' + str(self.id)) if self.id is not None else ''}, [{', '.join(str(expr) for expr in self.cell)}]"
 
 class FuncCall(Expr):
     def __init__(self, name: str, args: List[Expr]):
@@ -139,7 +138,7 @@ class Id(LHS):
         super().__init__()
         self.name = name
     def __repr__(self):
-        return f"Id({self.name})"
+        return f"Id({self.name}{(', ' + str(self.id)) if self.id is not None else ''})"
 
 class IntegerLit(AtomicLiteral):
     def __init__(self, val: int):
@@ -171,7 +170,7 @@ class AssignStmt(Stmt):
         self.rhs = rhs
         self.typ = typ
     def __repr__(self):
-        return f"{self.id}: Assign({str(self.lhs)}, {str(self.rhs)})"
+        return f"{self.id} {str(self.lhs)} := {str(self.rhs)}"
 
 class IfStmt(Stmt):
     def __init__(self, cond: Expr, tstmt: StmtBlock, fstmt: StmtBlock or None = None):
@@ -251,7 +250,7 @@ class VarDecl(Stmt):
         self.typ = typ
         self.init = init
     def __repr__(self):
-        return f"{self.id}: VarDecl({self.name}, {self.typ}{(', ' + str(self.init)) if self.init is not None else ''})"
+        return f"{self.id} {self.name}: {self.typ}{(' := ' + str(self.init)) if self.init is not None else ''}"
 
 class ParamDecl(Decl):
     def __init__(self, name: str, typ: Type, out: bool = False, inherit: bool = False):

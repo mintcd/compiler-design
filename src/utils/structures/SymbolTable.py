@@ -5,19 +5,22 @@ class Symbol:
     def __init__(self,  id : int,                   # unique ID for each symbol
                         name: str,                  # symbol name
                         datatype: Type,             # type of variable symbol, or return type of function symbol
-                        scope: tuple = (0, 0),      # (0,0) if global scope, (<func_name>, <s>) if in a func_name function, called s times in stack
+                        scope: tuple = (0),
                         value = None,               # current value, exclusive to variable and parameter
                         params: List[Type] or None = None # List of parameter types, exclusive to function symbol
                 ):
 
         self.id = id
         self.name = name
-        self.datatype = datatype
         self.scope = scope
+        self.datatype = datatype
         self.value = value
         self.params = params
 
     def __str__(self):
+        return "Symbol({}, {}, {}, {})".format(self.id, self.name, self.datatype, self.scope)
+
+    def __repr__(self):
         return "Symbol({}, {}, {})".format(self.name, self.datatype, self.scope)
 
 class FuncSym(Symbol):
@@ -52,7 +55,6 @@ class SymbolTable:
     def __str__(self):
         return ",\n".join(str(symbol) for symbol in self.symbols)
 
-
     def get_avail_id(self):
         self.avail_id += 1
         return self.avail_id-1
@@ -66,21 +68,33 @@ class SymbolTable:
     def get_varsym(self):
         return [sym for sym in self.symbols if isinstance(sym, VarSym)]
 
-    def add_symbol(self, symbol: Symbol):
+    def add_symbol(self, decl: VarDecl or FuncDecl):
         '''
         Add a new Symbol to the current Symbol Table and return a new Symbol Table instance
         '''
-        self.symbols.append(symbol)
+        if isinstance(decl, VarDecl):
+					symbol = Symbol(self.avail_id, decl.name, decl.typ, decl.id[: len(ast.id)-1], decl.init)
+          self.symbols.append(symbol)
+				else: isinstance(decl, FuncDecl):
+					symbol = Symbol(self.avail_id, decl.name, decl.rtype, (0), params=ast.params)
+					
+
         self.avail_id += 1
 
         return self
     
-    def get_symbol(self, name: str):
+    def get_symbol(self, name: str, _id: tuple or None = None):
+        exact_match = None
+        name_match = None
+        
         for symbol in self.symbols:
             if symbol.name == name:
-                return symbol
+                if _id is not None and symbol.id == _id:
+                    return symbol
+                name_match = symbol
         
-        return None
+        return name_match
+
     
     def type_inference(self, name, typ):
         symbol = self.find_symbol(name)
