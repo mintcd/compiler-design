@@ -1,7 +1,7 @@
 from utils.visitors import ASTVisitor
 from utils.structures.AST import *
 
-from utils.assist_visitors.InforAssigner import InforAssigner
+from utils.assist_visitors.ASTInforAssigner import ASTInforAssigner
 from utils.assist_visitors.SymbolTableBuilder import SymbolTableBuilder
 
 from utils.structures.SymbolTable import SymbolTable
@@ -41,7 +41,7 @@ class ScopeJustifier(ASTVisitor):
     '''
 
     def __init__(self, ast, log_file = None):
-        self.ast = InforAssigner(ast).assign()
+        self.ast = ASTInforAssigner(ast).assign()
         self.st = SymbolTableBuilder(ast, log_file).build()
         self.log_file = log_file
 
@@ -166,14 +166,14 @@ class ScopeJustifier(ASTVisitor):
 
         return data
 
-    def visitIntegerLit(self, ast, data : Data):
+    def visitInteger(self, ast, data : Data):
         return data
 
-    def visitFloatLit(self, ast, data : Data):
+    def visitFloat(self, ast, data : Data):
         return data
     
-    def visitStringLit(self, ast, data : Data):
+    def visitString(self, ast, data : Data):
         return data
 
-    def visitBooleanLit(self, ast, data : Data):
+    def visitBoolean(self, ast, data : Data):
         return data

@@ -75,17 +75,17 @@ class CopyPropagator(CFGVisitor):
 
   #       data = self.visit(expr, data)
       
-  def visitIntegerLit(self, cfg, data : Data):
+  def visitInteger(self, cfg, data : Data):
       return data
 
-  def visitFloatLit(self, cfg, data : Data):
+  def visitFloat(self, cfg, data : Data):
       return data
   
-  def visitStringLit(self, cfg, data : Data):
+  def visitString(self, cfg, data : Data):
       return data
 
-  def visitBooleanLit(self, cfg, data : Data):
+  def visitBoolean(self, cfg, data : Data):
       return data
 
-  # def visitArrayLit(self, cfg : ArrayLit, data : Data):
-  #     return ArrayLit([self.visit(expr) for expr in cfg.explist])
+  # def visitArray(self, cfg : Array, data : Data):
+  #     return Array([self.visit(expr) for expr in cfg.val])

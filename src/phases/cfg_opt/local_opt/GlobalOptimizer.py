@@ -1,5 +1,0 @@
-'''
-  CFG global optimizer, including
-
-  
-'''

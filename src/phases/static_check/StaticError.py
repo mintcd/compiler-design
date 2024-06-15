@@ -82,7 +82,7 @@ class MustInLoop(StaticError):
         return f"Must in loop: {str(self.stmt)}"
 
 
-class IllegalArrayLiteral(StaticError):
+class IllegalArrayeral(StaticError):
     def __init__(self, literal):
         self.literal = literal
 

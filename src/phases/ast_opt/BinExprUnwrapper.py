@@ -92,18 +92,21 @@ class BinExprUnwrapper(ASTVisitor):
         return data
 
     def visitAssignStmt(self, ast : AssignStmt, data):
-        data.ctx.current_stmt = ast
+      # print(95, ast)
 
-        data = self.visit(ast.rhs, data)
-        
-        ast.rhs = data.ctx.last_expr
+      data.ctx.current_stmt = ast
+      data = self.visit(ast.lhs, data)
+      data = self.visit(ast.rhs, data)
+      
+      ast.rhs = data.ctx.last_expr
 
-        return data
+      return data
 
     def visitBinExpr(self, ast : BinExpr, data : Data):
+      print("Visiting", ast)
       ctx = data.ctx
 
-      # Prepare ctx
+      # Prepare context
       ctx.last_expr = None
       ctx.last_datatype = None
 
@@ -142,8 +145,9 @@ class BinExprUnwrapper(ASTVisitor):
       return data
 
     def visitArrayCell(self, ast, data):
-      for expr in ast.cell:
-        data = self.visit(expr, data)
+      for i in range(len(ast.cell)):
+        data = self.visit(ast.cell[i], data)
+        ast.cell[i] = data.ctx.last_expr
         
       data.ctx.last_expr = ast
 
@@ -157,31 +161,31 @@ class BinExprUnwrapper(ASTVisitor):
 
       return data
 
-    def visitArrayLit(self, ast : ArrayLit, data : Data):
-      for i in range(len(ast.explist)):
-        data = self.visit(ast.explist[i], data)
-        ast.explist[i] = data.ctx.last_expr
+    def visitArray(self, ast : Array, data : Data):
+      for i in range(len(ast.val)):
+        data = self.visit(ast.val[i], data)
+        ast.val[i] = data.ctx.last_expr
         
       data.ctx.last_expr = ast
 
       return data
 
-    def visitIntegerLit(self, ast, data):
+    def visitInteger(self, ast, data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = infer_type(IntegerType(), data.ctx.last_datatype)
+      data.ctx.last_datatype = infer_type(ast, data.ctx.last_datatype)
       return data
 
-    def visitFloatLit(self, ast, data):
+    def visitFloat(self, ast, data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = infer_type(FloatType(), data.ctx.last_datatype)
+      data.ctx.last_datatype = infer_type(ast, data.ctx.last_datatype)
       return data
     
-    def visitStringLit(self, ast, data : Data):
+    def visitString(self, ast, data : Data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = StringType()
+      data.ctx.last_datatype = ast
       return data
 
-    def visitBooleanLit(self, ast, data : Data):
+    def visitBoolean(self, ast, data : Data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = BooleanType()
+      data.ctx.last_datatype = ast
       return data

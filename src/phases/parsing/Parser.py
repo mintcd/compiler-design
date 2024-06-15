@@ -132,13 +132,13 @@ class Parser:
             p[0] = UnExpr(p[1], p[2])
         else:
             if p.slice[1].type == 'INTLIT':
-                p[0] = IntegerLit(p[1])
+                p[0] = Integer(p[1])
             elif p.slice[1].type == 'FLOATLIT':
-                p[0] = FloatLit(p[1])
+                p[0] = Float(p[1])
             elif p.slice[1].type == 'STRINGLIT':
-                p[0] = StringLit(p[1])
+                p[0] = String(p[1])
             elif p.slice[1].type == 'BOOLEANLIT':
-                p[0] = BooleanLit(p[1])
+                p[0] = Boolean(p[1])
             elif p.slice[1].type == 'ID':
                 p[0] = Id(p[1])
             else:
@@ -146,7 +146,7 @@ class Parser:
 
     def p_arraylit(self, p):
         '''arraylit : LB exprlist RB'''
-        p[0] = ArrayLit(p[2])
+        p[0] = Array(p[2])
     
     def p_arraycell(self, p):
         '''arraycell : ID LSB exprprime RSB'''
@@ -254,7 +254,7 @@ class Parser:
                 | VOID
         '''
         if p.slice[1].type == 'VOID':
-            p[1] = VoidType()
+            p[1] = Void()
         p[0] = p[1]
 
     def p_returnabletype(self, p):
@@ -266,7 +266,7 @@ class Parser:
 
     def p_array(self, p):
         '''array : ARRAY LSB intprime RSB OF atomictype'''
-        p[0] = ArrayType(p[3], p[6])
+        p[0] = Array(None, p[3], p[6])
 
     def p_atomictype(self, p):
         '''atomictype : BOOLEAN 
@@ -275,13 +275,13 @@ class Parser:
                     | STRING
         '''
         if p.slice[1].type == 'BOOLEAN':
-            p[0] = BooleanType()
+            p[0] = Boolean()
         elif p.slice[1].type == 'INTEGER':
-            p[0] = IntegerType()
+            p[0] = Integer()
         elif p.slice[1].type == 'FLOAT':
-            p[0] = FloatType()
+            p[0] = Float()
         else:
-            p[0] = StringType()
+            p[0] = String()
 
 ################## LISTS ###############################
     def p_exprlist(self, p):

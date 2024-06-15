@@ -28,7 +28,9 @@ class Stmt(AST):
     def __init__(self, _id: Tuple[int] or None = None, block: StmtBlock or None = None):
         self.id = _id if _id is not None else None
         self.block = block if block is not None else None
-class Expr(AST): pass
+class Expr(AST):
+    def __init__(self, block = None):
+        self.block = block
 class Type(AST): pass
 class Decl(AST): pass
 
@@ -39,7 +41,9 @@ class Program(AST):
     def __repr__(self):
         return "Program([\n\t{}\n])".format("\n\t".join([str(decl) for decl in self.decls]))
 
-class AtomicLiteral(Expr): pass
+class Atomic(Expr):
+    def __init__(self, block = None):
+        super().__init__(block)
 
 ########################### Expressions ##########################################
 
@@ -59,34 +63,51 @@ class BinExpr(Expr):
         return "BinExpr({}, {}, {})".format(self.op, str(self.left), str(self.right))    
 
     def calculate(self):
+        calculated_val = None
+
         if self.op == "+":
-            return self.left.val + self.right.val
+            calculated_val = self.left.val + self.right.val
         if self.op == "-":
-            return self.left.val - self.right.val
+            calculated_val = self.left.val - self.right.val
         if self.op == "*":
-            return self.left.val * self.right
+            calculated_val = self.left.val * self.right
         if self.op == "/":
-            return self.left.val / self.right.val
+            calculated_val = self.left.val / self.right.val
         if self.op == "%":
-            return self.left.val % self.right.val
+            calculated_val = self.left.val % self.right.val
         if self.op == "&&":
-            return self.left.val and self.right.val
+            calculated_val = self.left.val and self.right.val
         if self.op == "||":
-            return self.left.val or self.right.val
+            calculated_val = self.left.val or self.right.val
         if self.op == "==":
-            return self.left.val == self.right.val
+            calculated_val = self.left.val == self.right.val
         if self.op == "!=":
-            return self.left.val != self.right.val
+            calculated_val = self.left.val != self.right.val
         if self.op == "<":
-            return self.left.val < self.right.val
+            calculated_val = self.left.val < self.right.val
         if self.op == ">":
-            return self.left.val > self.right.val
+            calculated_val = self.left.val > self.right.val
         if self.op == "<=":
-            return self.left.val > self.right.val
+            calculated_val = self.left.val > self.right.val
         if self.op == ">=":
-            return self.left.val > self.right.val
+            calculated_val = self.left.val > self.right.val
         if self.op == "::":
-            return self.left.val + self.right.val
+            calculated_val = self.left.val + self.right.val
+
+        inferred_type = self._infer_type(self.left, self.right)
+        inferred_type.val = calculated_val
+
+        return inferred_type
+
+    def _infer_type(self, typ1, typ2):
+        if typ1 is None:
+            return typ2
+        if typ2 is None:
+            return typ1
+
+        if isinstance(typ1, Float) or isinstance(typ2, Float):
+            return Float()
+        return typ1
 
 class UnExpr(Expr):
     def __init__(self, op: str, val: Expr):
@@ -98,11 +119,16 @@ class UnExpr(Expr):
         return "UnExpr({}, {})".format(self.op, str(self.val))
 
     def calculate(self):
+        calculated_val = None
         if self.op == "-":
-            return - self.val.val
+            calculated_val = - self.val.val
         if self.op == "!":
-            return not self.val.val
+            calculated_val = not self.val.val
+        
+        self.val.val = calculated_val
 
+        return self.val
+        
 class ArrayCell(LHS):
     def __init__(self, name: str, cell: List[Expr]):
         super().__init__()
@@ -117,17 +143,19 @@ class FuncCall(Expr):
         self.name = name
         self.args = args
 
-class ArrayLit(Expr):
-    def __init__(self, explist: List[Expr]):
-        self.explist = explist
+class Array(Expr):
+    def __init__(self, val: List[Expr] or None = None, dim = None, typ = None):
+        self.val = val
+        self.dim = dim
+        self.typ = typ
 
     def __repr__(self):
-        return f"Array([{', '.join(str(expr) for expr in self.explist)}])"
+        return f"Array([{', '.join(str(expr) for expr in self.val)}], {self.typ})" if self.val is not None else f"Array({self.dim}, {self.typ})"
 
     def get_value(self):
         result = []
-        for expr in self.explist:
-            if isinstance(expr, ArrayLit):
+        for expr in self.val:
+            if isinstance(expr, Array):
                 result.append(expr.get_value())
             else:
                 result.append(expr)
@@ -137,28 +165,32 @@ class Id(LHS):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
-    def __repr__(self):
+    def __str__(self):
         return f"Id({self.name}{(', ' + str(self.id)) if self.id is not None else ''})"
 
-class IntegerLit(AtomicLiteral):
-    def __init__(self, val: int):
+class Integer(Atomic):
+    def __init__(self, val: int or None = None):
+        self.val = val
+    def __str__(self):
+        return f"Int({str(self.val)})" if self.val is not None else "int"
+
+class Float(Atomic):
+    def __init__(self, val: float or None = None):
         self.val = val
     def __repr__(self):
-        return str(self.val)
+        return f"Float({str(self.val)})" if self.val is not None else "float"
 
-class FloatLit(AtomicLiteral):
-    def __init__(self, val: float):
-        self.val = val
-    def __repr__(self):
-        return str(self.val)
-
-class StringLit(AtomicLiteral):
-    def __init__(self, val: str):
+class String(Atomic):
+    def __init__(self, val: str or None = None):
         self.val = val
 
-class BooleanLit(AtomicLiteral):
-    def __init__(self, val: bool):
+class Boolean(Atomic):
+    def __init__(self, val: bool or None = None):
         self.val = val
+
+class Void():
+  def __str__(self):
+    return "Void"
 
 
 ############################### Statements ##################################
@@ -275,38 +307,38 @@ class FuncDecl(Decl):
 
 
 ################### Types ##########################
-class AtomicType(Type): 
-    def __repr__(self):
-        return self.__class__.__name__
+# class AtomicType(Type): 
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class IntegerType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
+# class IntegerType(AtomicType): 
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class FloatType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
+# class Float(AtomicType): 
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class BooleanType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
+# class Boolean(AtomicType): 
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class StringType(AtomicType): 
-    def __repr__(self):
-        return self.__class__.__name__
+# class String(AtomicType): 
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class ArrayType(Type):
-    def __init__(self, dimensions: List[int], typ: AtomicType):
-        self.dimensions = dimensions
-        self.typ = typ
+# class ArrayType(Type):
+#     def __init__(self, dimensions: List[int], typ: AtomicType):
+#         self.dimensions = dimensions
+#         self.typ = typ
 
-    def __repr__(self):
-        return "ArrayType([{}], {})".format(", ".join([str(dimen) for dimen in self.dimensions]), str(self.typ))
+#     def __repr__(self):
+#         return "ArrayType([{}], {})".format(", ".join([str(dimen) for dimen in self.dimensions]), str(self.typ))
 
-class AutoType(Type):
-    def __repr__(self):
-        return self.__class__.__name__
+# class Auto(Type):
+#     def __repr__(self):
+#         return self.__class__.__name__
 
-class VoidType(Type):
-    def __repr__(self):
-        return self.__class__.__name__
+# class Void(Type):
+#     def __repr__(self):
+#         return self.__class__.__name__

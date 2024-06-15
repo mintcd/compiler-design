@@ -17,8 +17,8 @@ class ConstantFolder(CFGVisitor):
   '''
     Whenever y := [expression of literals], compute it
   '''
-  def __init__(self, cfg):
-      self.cfg = cfg
+  def __init__(self, cfg, st, log_file = None):
+      super().__init__(cfg, st, log_file)
   
   def propagate(self):
     return self.visit(self.cfg, Data(self.cfg, Context())).obj
@@ -75,17 +75,17 @@ class ConstantFolder(CFGVisitor):
 
   #       data = self.visit(expr, data)
       
-  def visitIntegerLit(self, cfg, data : Data):
+  def visitInteger(self, cfg, data : Data):
       return data
 
-  def visitFloatLit(self, cfg, data : Data):
+  def visitFloat(self, cfg, data : Data):
       return data
   
-  def visitStringLit(self, cfg, data : Data):
+  def visitString(self, cfg, data : Data):
       return data
 
-  def visitBooleanLit(self, cfg, data : Data):
+  def visitBoolean(self, cfg, data : Data):
       return data
 
-  # def visitArrayLit(self, cfg : ArrayLit, data : Data):
-  #     return ArrayLit([self.visit(expr) for expr in cfg.explist])
+  # def visitArray(self, cfg : Array, data : Data):
+  #     return Array([self.visit(expr) for expr in cfg.val])

@@ -16,6 +16,9 @@ from phases.ast_opt.VarDeclRemover import VarDeclRemover
 
 from phases.cfg_build.CFGBuilder import CFGBuilder
 
+from phases.cfg_opt.EmptyBlockRemover import EmptyBlockRemover
+from phases.cfg_opt.LocalOptimizer import LocalOptimizer
+
 from phases.code_generation.CodeGenerator import CodeGenerator
 
 
@@ -53,7 +56,10 @@ def build_symbol_table(ast, log_file = None):
 def build_cfg(ast, log_file = None):
   return CFGBuilder(ast, log_file).build()
 
-def optimize_cfg(cfg, log_file = None):
+def optimize_cfg(cfg, st, log_file = None):
+  cfg = EmptyBlockRemover(cfg, st, log_file).remove()
+  cfg = LocalOptimizer(cfg, st, log_file).optimize()
+
   return cfg
 
 def generate_code(cfg, num_reg, st, log_file = None):

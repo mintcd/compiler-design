@@ -77,10 +77,10 @@ class StaticChecker(Visitor):
     def visit(self, ast, param = None) -> SymbolTable:
         return ast.accept(self, param)
 
-    def visitArrayLit(self, ast : ArrayLit, st : SymbolTable):
+    def visitArray(self, ast : Array, st : SymbolTable):
         """ All elements must be of the same type and not be AutoType"""
         typ = AutoType()
-        for expr in ast.explist:
+        for expr in ast.val:
             st, exptyp = self.visit(exp, st)
             # Element is invalid
             if type(exptyp) is IllegalType: 
@@ -94,8 +94,8 @@ class StaticChecker(Visitor):
 
         # Elements are arrays
         if type(typ) is ArrayType:
-            return st.update_current_datatype(ArrayType([len(ast.explist)] + typ.dimensions, typ.typ))
-        return st.update_current_datatype(ArrayType([len(ast.explist)], typ))
+            return st.update_current_datatype(ArrayType([len(ast.val)] + typ.dimensions, typ.typ))
+        return st.update_current_datatype(ArrayType([len(ast.val)], typ))
 
     def visitId(self, ast : Id, st: SymbolTable):
         symbol = st.find_symbol(ast.name)
@@ -138,41 +138,41 @@ class StaticChecker(Visitor):
             ltype = rtype
 
         if ast.op in ["+", "-", "*"]:
-            if type(ltype) not in [IntegerType, FloatType] or type(rtype) not in [IntegerType, FloatType]: raise TypeMismatchInExpression(ast)
-            if FloatType in [type(ltype), type(rtype)]: return st, FloatType()
+            if type(ltype) not in [IntegerType, Float] or type(rtype) not in [IntegerType, Float]: raise TypeMismatchInExpression(ast)
+            if Float in [type(ltype), type(rtype)]: return st, Float()
             return st, IntegerType()
         elif ast.op == "/":
-            if type(rtype) not in [IntegerType, FloatType] or type(ltype) not in [IntegerType, FloatType]: raise TypeMismatchInExpression(ast)
-            return st, FloatType()
+            if type(rtype) not in [IntegerType, Float] or type(ltype) not in [IntegerType, Float]: raise TypeMismatchInExpression(ast)
+            return st, Float()
         elif ast.op == "%":
             if type(rtype) is not IntegerType or type(ltype) is not IntegerType: raise TypeMismatchInExpression(ast)
             return st, IntegerType()
         elif ast.op in ["&&", "||"]:
-            if type(rtype) is not BooleanType or type(ltype) is not BooleanType: raise TypeMismatchInExpression(ast)
-            return st, BooleanType()
+            if type(rtype) is not Boolean or type(ltype) is not Boolean: raise TypeMismatchInExpression(ast)
+            return st, Boolean()
         elif ast.op == "::":
-            if type(rtype) is not StringType or type(ltype) is not StringType: raise TypeMismatchInExpression(ast)
-            return st, StringType()
+            if type(rtype) is not String or type(ltype) is not String: raise TypeMismatchInExpression(ast)
+            return st, String()
         elif ast.op in ["==", "!="]:
             if type(rtype) is not type(ltype): raise TypeMismatchInExpression(ast)
-            if ltype not in [IntegerType, BooleanType]: raise TypeMismatchInExpression(ast)
-            return st, BooleanType()
+            if ltype not in [IntegerType, Boolean]: raise TypeMismatchInExpression(ast)
+            return st, Boolean()
         elif ast.op in ["<", ">", "<=", ">="]:
-            if type(rtype) not in [IntegerType, FloatType] or type(ltype) not in [IntegerType, FloatType]: raise TypeMismatchInExpression(ast)
-            return st, BooleanType()
+            if type(rtype) not in [IntegerType, Float] or type(ltype) not in [IntegerType, Float]: raise TypeMismatchInExpression(ast)
+            return st, Boolean()
 
     def visitUnExpr(self, ast, st):
         st, typ = self.visit(ast.val, st)
         if ast.op == "-":
             if type(typ) is AutoType: 
                 typ = Utils.infer(ast.val.name, IntegerType(), st)
-            elif type(typ) not in [IntegerType, FloatType]: raise TypeMismatchInExpression(ast)
+            elif type(typ) not in [IntegerType, Float]: raise TypeMismatchInExpression(ast)
             return st, typ
         elif ast.op == "!":
             if type(typ) is AutoType: 
-                typ = Utils.infer(ast.val.name, BooleanType(), st)
-            elif type(typ) is not BooleanType: raise TypeMismatchInExpression(ast)
-            return st, BooleanType()
+                typ = Utils.infer(ast.val.name, Boolean(), st)
+            elif type(typ) is not Boolean: raise TypeMismatchInExpression(ast)
+            return st, Boolean()
 
     def visitFuncCall(self, ast: FuncCall, st: SymbolTable):
         # Check if there is callee
@@ -219,8 +219,8 @@ class StaticChecker(Visitor):
         """Check cond"""
         st, condtype = self.visit(ast.cond, st)
 
-        if type(condtype) is AutoType: Utils.infer(ast.cond.name, BooleanType, st)
-        if type(condtype) is not BooleanType: raise TypeMismatchInStatement(ast)
+        if type(condtype) is AutoType: Utils.infer(ast.cond.name, Boolean, st)
+        if type(condtype) is not Boolean: raise TypeMismatchInStatement(ast)
         
         newst = Utils.comeInBlock(st)
 
@@ -237,10 +237,10 @@ class StaticChecker(Visitor):
         st, rhs = self.visit(ast.init.rhs, st)
 
         if type(rhs) is not IntegerType or type(lhs) is not IntegerType: raise TypeMismatchInStatement(ast)
-        """ Make sure cond is BooleanType"""
+        """ Make sure cond is Boolean"""
         st, condType = self.visit(ast.cond, st)
-        if type(condType) is AutoType: Utils.infer(ast.cond.name, BooleanType, st)
-        if type(condType) is not BooleanType: raise TypeMismatchInStatement(ast)
+        if type(condType) is AutoType: Utils.infer(ast.cond.name, Boolean, st)
+        if type(condType) is not Boolean: raise TypeMismatchInStatement(ast)
         
         """Make sure upd is IntegerType"""
         st, updType = self.visit(ast.upd, st)
@@ -252,8 +252,8 @@ class StaticChecker(Visitor):
 
     def visitWhileStmt(self, ast : WhileStmt, st : SymbolTable):
         st, condType = self.visit(ast.cond, st)
-        if type(condType) is AutoType: Utils.infer(ast.cond.name, BooleanType, st)
-        if type(condType) is not BooleanType: raise TypeMismatchInStatement(ast)
+        if type(condType) is AutoType: Utils.infer(ast.cond.name, Boolean, st)
+        if type(condType) is not Boolean: raise TypeMismatchInStatement(ast)
         
         st, _ = self.visit(ast.stmt, Utils.comeInLoop(st))
         return Utils.comeOutLoop(st), LoopStmtType()
@@ -261,8 +261,8 @@ class StaticChecker(Visitor):
     def visitDoWhileStmt(self, ast, st):
         st, condType = self.visit(ast.cond, st)
 
-        if type(condType) is AutoType: Utils.infer(ast.cond.name, BooleanType, st)
-        if type(condType) is not BooleanType: 
+        if type(condType) is AutoType: Utils.infer(ast.cond.name, Boolean, st)
+        if type(condType) is not Boolean: 
             raise TypeMismatchInStatement(ast)
         
         st, _ = self.visit(ast.stmt, Utils.comeInLoop(st))

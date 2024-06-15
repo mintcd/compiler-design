@@ -1,15 +1,25 @@
 from utils.visitors import CFGVisitor
 from utils.structures.AST import *
-from structures.CFG import Block, CFG
+from utils.structures.CFG import Block, CFG
 
+from utils.APIs import assign_info
 
 class EmptyBlockRemover(CFGVisitor):
 
-  def __init__(self, cfg : CFG):
-    self.cfg = cfg
+  def __init__(self, cfg : CFG, st, log_file = None):
+    super().__init__(cfg, st, log_file)
 
   def remove(self):
-    return self.visit(self.cfg, None)
+    cfg = self.visit(self.cfg, None)
+    cfg = assign_info(cfg)
+
+    if self.log_file is not None:
+      with open(self.log_file, 'a') as file:
+          file.write("CFG after removing empty blocks\n")
+          file.write(f"{str(cfg)}\n\n")
+          file.write("--------------------------------------------------------\n\n")
+
+    return cfg
 
   def visitCFG(self, cfg : CFG, data):
     for block in cfg.blocks:

@@ -1,8 +1,7 @@
-from utils.visitor_pattern import Data
 from utils.visitors import ASTVisitor
 from utils.structures.SymbolTable import *
 
-from utils.assist_visitors.InforAssigner import InforAssigner
+from utils.assist_visitors.ASTInforAssigner import ASTInforAssigner
 
 class Context:
   def __init__(self, current_scope = (0,0), 
@@ -24,7 +23,7 @@ class SymbolTableBuilder(ASTVisitor):
     Build Symbol Table for AST
   '''
   def __init__(self, ast : AST, log_file = None):
-    self.ast = InforAssigner(ast).assign()
+    self.ast = ASTInforAssigner(ast).assign()
     self.log_file = log_file
 
   def build(self): 
@@ -77,8 +76,6 @@ class SymbolTableBuilder(ASTVisitor):
   
   def visitVarDecl(self, ast : VarDecl, data):
       st = data.obj
-      ctx = data.ctx
-
       st.add_symbol(ast)
 
       return data
@@ -92,23 +89,14 @@ class SymbolTableBuilder(ASTVisitor):
       st = data.obj
       ctx = data.ctx
 
-      st.add_symbol(Symbol(st.get_avail_id(), ast.name, ast.rtype, (0), params=ast.params))
+      st.add_symbol(ast)
 
-      # If the function is called recursively, ignore
-      if ctx.current_scope[1] == 1:
-        return data
-      else:
-        if ctx.current_scope[0] == ast.name:
-          ctx.current_scope[1] == 1
-        else: 
-          ctx.current_scope = (ast.name, 0)
-
-      for i in range(len(ast.params)):
-        st.symbols.append(Symbol(st.get_avail_id(), 
-                            ast.params[i].name, 
-                            ast.params[i].typ, 
-                            ctx.current_scope,
-                            ctx.args[i]))
+      # for param in ast.params:
+      #   st.symbols.append(Symbol(st.get_avail_id(), 
+      #                       ast.params[i].name, 
+      #                       ast.params[i].typ, 
+      #                       ast.id,
+      #                       ctx.args[i]))
 
       data = self.visit(ast.body, data)
       

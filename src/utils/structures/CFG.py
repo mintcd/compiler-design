@@ -15,7 +15,7 @@ class Block(Visitee):
                 link = None,  
                 end = None,
                 
-                stmts : List[Stmt] or None  = None,
+                stmts : List[AssignStmt] or None  = None,
                 cond: Expr or None = None):
 
         self.id = id

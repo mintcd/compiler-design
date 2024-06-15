@@ -51,7 +51,8 @@ def main():
 
         cfg = build_cfg(ast, log_file)
 
-        cfg = optimize_cfg(cfg, log_file)
+        cfg = optimize_cfg(cfg, st, log_file)
+
         code = generate_code(cfg, num_reg, st, log_file)
 
         with open(os.path.join(solution_dir, f"{args.file_name.split('.')[0]}.asm"), 'w') as file:

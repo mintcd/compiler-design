@@ -14,12 +14,12 @@ class Data:
     self.obj = obj
     self.ctx = Context() if ctx is None else ctx
 
-class InforAssigner(ASTVisitor):
+class ASTInforAssigner(ASTVisitor):
     '''
       Assign the parent block and a unique id to each statement
     '''
 
-    def __init__(self, ast):
+    def __init__(self, ast, log_file = None):
         self.ast = ast
 
     def assign(self):
@@ -167,9 +167,9 @@ class InforAssigner(ASTVisitor):
 
     #   return data
 
-    # def visitArrayLit(self, ast : ArrayLit, data):
+    # def visitArray(self, ast : Array, data):
     #   ast.stmt = data.ctx.current_stmt
-    #   for expr in ast.explist:
+    #   for expr in ast.val:
     #     data = self.visit(expr, data)
       
     #   return data
@@ -179,14 +179,14 @@ class InforAssigner(ASTVisitor):
     #   ast.stmt = data.ctx.current_stmt
     #   return data 
 
-    # def visitIntegerLit(self, ast, data):
+    # def visitInteger(self, ast, data):
     #     return data
 
-    # def visitFloatLit(self, ast, data):
+    # def visitFloat(self, ast, data):
     #     return data
     
-    # def visitStringLit(self, ast, data):
+    # def visitString(self, ast, data):
     #     return data
 
-    # def visitBooleanLit(self, ast, data):
+    # def visitBoolean(self, ast, data):
     #     return data

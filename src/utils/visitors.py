@@ -79,7 +79,7 @@ class ASTVisitor(Visitor):
         return data
 
 ########################## COMPLEX EXPRESSIONS ##########################
-    def visitArrayLit(self, ast: ArrayLit, data : Data):
+    def visitArray(self, ast: Array, data : Data):
         return data
         
     def visitFuncCall(self, ast, data : Data):
@@ -95,58 +95,38 @@ class ASTVisitor(Visitor):
         return data
 
 ########################## ATOMIC LITERALS ##############################
-    def visitIntegerLit(self, ast: IntegerLit, data : Data):
+    def visitInteger(self, ast: Integer, data : Data):
         return data
 
-    def visitFloatLit(self, ast: FloatLit, data : Data):
+    def visitFloat(self, ast: Float, data : Data):
         return data
     
-    def visitStringLit(self, ast: StringLit, data : Data):
+    def visitString(self, ast: String, data : Data):
         return data
 
-    def visitBooleanLit(self, ast: BooleanLit, data : Data):
+    def visitBoolean(self, ast: Boolean, data : Data):
         return data
 
     def visitId(self, ast: Id, data : Data):
         return data
 
-########################## TYPES ########################################    
-    def visitIntegerType(self, ast: IntegerType, data : Data): 
-        return data
-
-    def visitFloatType(self, ast: FloatType, data : Data): 
-        return data
- 
-    def visitBooleanType(self, ast: BooleanType, data : Data): 
-        return data
- 
-    def visitStringType(self, ast: StringType, data : Data): 
-        return data
- 
-    def visitArrayType(self, ast: ArrayType, data : Data):
-        return data
- 
-    def visitAutoType(self, ast: AutoType, data : Data):
-        return data
-
-    def visitVoidType(self, ast: VoidType, data : Data):
-        return data
-
 class CFGVisitor(Visitor):
-    def __init__(self, cfg):
-        self.ast = cfg
+    def __init__(self, cfg, st, log_file = None):
+        self.cfg = cfg
+        self.st = st
+        self.log_file = log_file
 
     def visitCFG(self, cfg : CFG, data): 
         for block in cfg.blocks:
-            data = self.visit(cfg, data)
+            data = self.visit(block, data)
         return data
     
     def visitBlock(self, cfg : Block, data):
         if cfg.cond is None:
             for stmt in cfg.stmts:
-                data = self.visit(stmt)
+                data = self.visit(stmt, data)
         else:
-            data = self.visit(cfg.cond)
+            data = self.visit(cfg.cond, data)
         return data
 
     def visitAssignStmt(self, cfg : AssignStmt, data : Data):
@@ -154,33 +134,33 @@ class CFGVisitor(Visitor):
         data = self.visit(cfg.rhs, data)
         return data
 
-    
-    def visitVarDecl(self, cfg : VarDecl, data):
-        return data
+############################ COMPLEX EXPRESSIONS #######################
 
-    def visitBinExpr(self, ast, data):
+    def visitBinExpr(self, cfg: BinExpr, data):
         return data
  
-    def visitUnExpr(self, ast, data):
-        return data
-  
-    def visitId(self, ast, data):
+    def visitUnExpr(self, cfg, data):
         return data
    
-    def visitArrayCell(self, ast, data):
+    def visitArrayCell(cfg, ast, data):
         return data
 
-    def visitArrayLit(self, ast, data):
+    def visitArray(self, cfg, data):
         return data
 
-    def visitIntegerLit(self, ast, data):
+############################ ATOMIC EXPRESSIONS ########################
+
+    def visitId(self, cfg: Id, data):
         return data
 
-    def visitFloatLit(self, ast, data):
+    def visitInteger(self, cfg: Integer, data):
+        return data
+
+    def visitFloat(self, cfg: Float, data):
         return data
     
-    def visitStringLit(self, ast, data):
+    def visitString(self, cfg: String, data):
         return data
 
-    def visitBooleanLit(self, ast, data):
+    def visitBoolean(self, cfg: Boolean, data):
         return data

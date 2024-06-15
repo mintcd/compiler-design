@@ -60,10 +60,10 @@ class CodeGenerator(CFGVisitor):
   def visitAssignStmt(self, cfg : AssignStmt, data):
       code = ""
 
-      if isinstance(cfg.rhs, AtomicLiteral):
+      if isinstance(cfg.rhs, Atomic):
         code += f"addi {self.reg_alloc[cfg.lhs.name]} 0 {cfg.rhs.val}\n"
 
-      # if isinstance(cfg.rhs, AtomicLiteral):
+      # if isinstance(cfg.rhs, Atomic):
       #   code += f"addi {self.reg_alloc[cfg.lhs.name]} 0 {rhs.value}"
       return code
   
@@ -93,6 +93,6 @@ class CodeGenerator(CFGVisitor):
   # def visitId(self, cfg : Id, ctx):
   #   return f"addi {ctx.lhs_reg} {self.reg_alloc[cfg.name]} 0\n"
   
-  def visitIntegerLit(self, cfg: IntegerLit, ctx):
+  def visitInteger(self, cfg: Integer, ctx):
     return f"addi {ctx.lhs_reg} {cfg.val} 0\n"
 

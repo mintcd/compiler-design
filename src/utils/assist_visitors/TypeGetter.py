@@ -27,27 +27,27 @@ class TypeGetter(ASTVisitor):
       return self.visit(node, data).obj
 
     ################################ LITERALS ############################
-    def visitIntegerLit(self, ast, data : Data):
-        data.obj = IntegerType()
-        data.ctx.last_type = IntegerType()
+    def visitInteger(self, ast, data : Data):
+        data.obj = Integer()
+        data.ctx.last_type = Integer()
         return data
 
-    def visitFloatLit(self, ast, data : Data):
-        data.obj = FloatType()
-        data.ctx.last_type = FloatType()
+    def visitFloat(self, ast, data : Data):
+        data.obj = Float()
+        data.ctx.last_type = Float()
         return data
     
-    def visitStringLit(self, ast, data : Data):
-        data.obj = StringType()
-        data.ctx.last_type = StringType()
+    def visitString(self, ast, data : Data):
+        data.obj = String()
+        data.ctx.last_type = String()
         return data
 
-    def visitBooleanLit(self, ast, data : Data):
-        data.obj = BooleanType()
-        data.ctx.last_type = BooleanType()
+    def visitBoolean(self, ast, data : Data):
+        data.obj = Boolean()
+        data.ctx.last_type = Boolean()
         return data
 
-    def visitArrayLit(self, ast, data : Data):
+    def visitArray(self, ast, data : Data):
         return data
 
     ################################## OTHER EXPRESSIONS ################################

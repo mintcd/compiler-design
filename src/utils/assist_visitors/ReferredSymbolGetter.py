@@ -25,8 +25,8 @@ class ReferredSymbolGetter(CFGVisitor):
       return self.visit(self.node, data).obj
 
     ################################ LITERALS ############################
-    def visitArrayLit(self, cfg: ArrayLit, data : Data):
-        for expr in cfg.explist:
+    def visitArray(self, cfg: Array, data : Data):
+        for expr in cfg.val:
           data = self.visit(expr, data)
 
         return data
