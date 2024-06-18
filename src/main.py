@@ -47,10 +47,9 @@ def main():
         ast = optimize_ast(ast, log_file)
 
         st = build_symbol_table(ast, log_file)
-        ast = remove_vardecls(ast, log_file)
+        
 
         cfg = build_cfg(ast, log_file)
-
         cfg = optimize_cfg(cfg, st, log_file)
 
         code = generate_code(cfg, num_reg, st, log_file)

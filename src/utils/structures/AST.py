@@ -5,6 +5,13 @@ class AST(Visitee):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+class Program(AST):
+    def __init__(self, decls):
+        self.decls = decls
+
+    def __repr__(self):
+        return "Program([\n\t{}\n])".format("\n\t".join([str(decl) for decl in self.decls]))
+
 # Statement container
 class StmtBlock(AST):
     def __init__(self, stmts):
@@ -25,21 +32,19 @@ class StmtBlock(AST):
         return self
 
 class Stmt(AST): 
-    def __init__(self, _id: Tuple[int] or None = None, block: StmtBlock or None = None):
+    def __init__(self, _id: Tuple[int] or None = None, 
+                            block: StmtBlock or None = None):
         self.id = _id if _id is not None else None
         self.block = block if block is not None else None
+        self.live_symbols = None
+
 class Expr(AST):
     def __init__(self, block = None):
         self.block = block
+        self.live_symbols = None
+
 class Type(AST): pass
 class Decl(AST): pass
-
-class Program(AST):
-    def __init__(self, decls):
-        self.decls = decls
-
-    def __repr__(self):
-        return "Program([\n\t{}\n])".format("\n\t".join([str(decl) for decl in self.decls]))
 
 class Atomic(Expr):
     def __init__(self, block = None):
@@ -190,8 +195,7 @@ class Boolean(Atomic):
 
 class Void():
   def __str__(self):
-    return "Void"
-
+    return "void"
 
 ############################### Statements ##################################
 

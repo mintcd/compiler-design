@@ -17,21 +17,27 @@ class Symbol:
         self.value = value
         self.params = params
 
-    def __str__(self):
-        return "Symbol({}, {}, {}, {})".format(self.id, self.name, self.datatype, self.scope)
+        self.register = None
+        self.dead = None
 
     def __repr__(self):
-        return "Symbol({}, {}, {})".format(self.name, self.datatype, self.scope)
+        print_reg = ''
+        if self.register is not None:
+            print_reg = ', ' + str(self.register)
+        if self.dead == True:
+            print_reg = ', dead'
+        
+        return f"Symbol({self.id}, {self.name}, {self.datatype}, {self.scope}{print_reg})"
 
-class FuncSym(Symbol):
-    def __init__(self, id, name, rtype, params: List[Type] or None = None):
-        super().__init__(id, name, rtype, (0, 0))
-        self.params = params if params is not None else []
 
-class VarSym(Symbol):
-    def __init__(self, id, name, typ, scope, value):
-        super().__init__(id, name, typ, scope)
-        self.value = value
+    def __repr__(self):
+        print_reg = ''
+        if self.register:
+            print_reg = ', ' + str(self.register)
+        if self.dead == True:
+            print_reg = ', dead'
+        
+        return f"Symbol({self.id}, {self.name}, {self.datatype}, {self.scope}{print_reg})"
 
 class SymbolTable:
     def __init__(self, symbols: List[Symbol] or None = None):
@@ -51,7 +57,9 @@ class SymbolTable:
         # ]
     
     def __str__(self):
-        return ",\n".join(str(symbol) for symbol in self.symbols)
+        symbols_str = ',\n'.join(str(symbol) for symbol in self.symbols)
+        return f"SymbolTable([\n{symbols_str}\n])"
+
 
     # def has_scope(self, scope: tuple):
     #     for symbol in self.symbols:

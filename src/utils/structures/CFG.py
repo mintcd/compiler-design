@@ -105,14 +105,6 @@ class CFG(Visitee):
     def get_block_by_name(self, name):
         return [block for block in self.blocks if block.name == name][0]
 
-    def get_symbols(self):
-        syms = set()
-        for block in self.blocks:
-            if block.cond is None:
-                for stmt in block.stmts:
-                    syms.add(stmt.lhs.name)
-        return list(syms)
-
     def get_stmts(self):
         res = list()
         for block in self.blocks:

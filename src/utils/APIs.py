@@ -9,6 +9,7 @@ from utils.assist_visitors.ASTInforAssigner import ASTInforAssigner
 from utils.assist_visitors.SymbolTableBuilder import SymbolTableBuilder
 from utils.assist_visitors.ReferredSymbolGetter import ReferredSymbolGetter
 from utils.assist_visitors.CFGInforAssigner import CFGInforAssigner
+from utils.assist_visitors.LivenessGenerator import LivenessGenerator
 
 def get_type(expr, st):
   return TypeGetter(expr, st).get()
@@ -24,3 +25,6 @@ def get_referred_symbols(node, st):
 
 def build_symbol_table(ast, log_file = None):
   return SymbolTableBuilder(ast, log_file).build()
+
+def generate_liveness(cfg, st, log_file = None):
+  return LivenessGenerator(cfg, st, log_file).generate()

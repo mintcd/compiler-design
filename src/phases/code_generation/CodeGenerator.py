@@ -1,16 +1,18 @@
 from utils.visitors import CFGVisitor
 from utils.structures.AST import *
 from utils.structures.CFG import *
+from utils.structures.SymbolTable import *
 
 from phases.code_generation.RegisterAllocator import RegisterAllocator
 
 class CodeGenerator(CFGVisitor):
-  def __init__(self, cfg : CFG, num_reg : int, st, log_file = None):
+  def __init__(self, cfg : CFG, num_reg : int, st : SymbolTable, log_file = None):
 
     self.st = st
     self.cfg = cfg    
     self.reg_alloc = RegisterAllocator(cfg, st, num_reg, log_file).allocate()
-    self.reg_alloc = {node : f"$t{attr}" for node, attr in self.reg_alloc.items()}
+    for symbol in self.st.symbols:
+      symbol.register = f"$t{symbol.register}"
 
     with open(log_file, 'a') as file:
         file.write("Register allocation for symbols\n\n")
@@ -24,9 +26,12 @@ class CodeGenerator(CFGVisitor):
     # Create data field for unallocated symbols
     code = ".data\n\n"
 
-    for sym in self.st.get_varsym():
-      if self.reg_alloc.get(sym.name) is None:
-        code += f"{sym}: .word {0}\n"
+    for symbol in self.st.symbols:
+      if symbol.register == 'spill':
+        if isinstance(symbol.datatype, String):
+          code += f"{symbol.name}{symbol.id}: .asciiz ""\n"
+        else:
+          code += f"{symbol.name}{symbol.id}: .word 0\n"
 
     code += "addi $0 $0 1\n"
 
@@ -61,10 +66,11 @@ class CodeGenerator(CFGVisitor):
       code = ""
 
       if isinstance(cfg.rhs, Atomic):
-        code += f"addi {self.reg_alloc[cfg.lhs.name]} 0 {cfg.rhs.val}\n"
+        print(69, cfg)
+        for symbol in self.st.symbols:
+          if symbol.id == cfg.lhs.id:
+            code += f"addi {symbol.register} 0 {cfg.rhs.val}\n"
 
-      # if isinstance(cfg.rhs, Atomic):
-      #   code += f"addi {self.reg_alloc[cfg.lhs.name]} 0 {rhs.value}"
       return code
   
   def visitBinExpr(self, cfg : BinExpr, data):

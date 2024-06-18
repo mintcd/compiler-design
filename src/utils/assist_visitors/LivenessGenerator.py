@@ -3,7 +3,7 @@ from utils.structures.CFG import *
 from utils.visitors import CFGVisitor
 
 from utils.structures.SymbolTable import SymbolTable
-from utils.APIs import get_referred_symbols
+from utils.assist_visitors.ReferredSymbolGetter import ReferredSymbolGetter
 
 
 import json
@@ -23,8 +23,9 @@ class LivenessGenerator(CFGVisitor):
   def __init__(self, cfg : CFG, st: SymbolTable, log_file = None):
     self.cfg = cfg
     self.st = st
+    self.log_file = log_file
 
-  def generate(self):
+  def generate(self) -> CFG:
     obj = dict()
     for symbol in self.st.symbols:
       for stmt in self.cfg.get_stmts():
@@ -33,9 +34,9 @@ class LivenessGenerator(CFGVisitor):
 
     data = Data(obj)
     loop = 0
-
     data = LiveIncomingRetriever(self.cfg, self.st, data).generate()
 
+    # Loop until there is no change
     while True:
       new_data = copy.deepcopy(data)
       new_data = OutInPropagator(self.cfg, self.st, new_data).propagate()
@@ -48,19 +49,33 @@ class LivenessGenerator(CFGVisitor):
       if loop == 100:
         raise Exception(f"Executed {loop} loop")
 
-    live = dict()
-
     for stmt in self.cfg.get_stmts():
-      live[stmt.id] = set()
-      for sym in set(self.st.symbols):
-        if data.obj[(stmt.id, sym.id, 'out')] == True:
-          live[stmt.id].add(sym)
+      stmt.live_symbols = set()
+      for symbol in self.st.symbols:
+        if data.obj[(stmt.id, symbol.id, 'out')] == True:
+          stmt.live_symbols.add(symbol)
         for succ_stmt in self.cfg.get_successors(stmt):
-          if data.obj[(succ_stmt.id, sym.id, 'in')] == True: 
-            live[stmt.id].add(sym)
-      live[stmt.id] = list(live[stmt.id])
+          if data.obj[(succ_stmt.id, symbol.id, 'in')] == True: 
+            stmt.live_symbols.add(symbol)
+      stmt.live_symbols = list(stmt.live_symbols)
+    
+    # Find symbols that are not dead
+    for stmt in self.cfg.get_stmts():
+      for symbol in stmt.live_symbols:
+        symbol.dead = False
+    
+    for symbol in self.st.symbols:
+      if symbol.dead != False:
+        symbol.dead = True
 
-    return live
+    with open(self.log_file, 'a') as file:
+      file.write("Live symbols after each statement:\n")
+      file.write("{\n\t")
+      file.write(",\n\t".join((str(stmt.id) + " " + str(stmt.live_symbols)) for stmt in self.cfg.get_stmts()))
+      file.write("\n}\n")
+      file.write("----------------------------------------\n\n")
+
+    return self.cfg
 
 class LiveIncomingRetriever(CFGVisitor):
   '''
@@ -88,13 +103,13 @@ class LiveIncomingRetriever(CFGVisitor):
       for stmt in cfg.stmts:
         data = self.visit(stmt, data)
     else:
-      for sym in get_referred_symbols(cfg.cond, self.st):
-        data.obj[(cfg.cond.id, sym.id, 'in')] = True
+      for symbol in ReferredSymbolGetter(cfg.cond, self.st).get():
+        data.obj[(cfg.cond.id, symbol.id, 'in')] = True
     return data
   
   def visitAssignStmt(self, cfg: AssignStmt, data : Data):
-    for sym in get_referred_symbols(cfg.rhs, self.st):
-      data.obj[(cfg.id, sym.id, 'in')] = True
+    for symbol in ReferredSymbolGetter(cfg.rhs, self.st).get():
+      data.obj[(cfg.id, symbol.id, 'in')] = True
 
     return data
 
@@ -115,8 +130,8 @@ class OutInPropagator(CFGVisitor):
     
   def visitBlock(self, cfg : Block, data : Data):
     if cfg.cond is not None:
-      for sym in set(self.st.symbols) - get_referred_symbols(cfg.cond, self.st):
-          data.obj[(cfg.cond.id, sym.id, 'in')] = data.obj[(cfg.cond.id, sym.id, 'out')]
+      for symbol in set(self.st.symbols) - ReferredSymbolGetter(cfg.cond, self.st).get():
+          data.obj[(cfg.cond.id, symbol.id, 'in')] = data.obj[(cfg.cond.id, symbol.id, 'out')]
     else:
       for stmt in cfg.stmts:
         data = self.visit(stmt, data)
@@ -124,8 +139,8 @@ class OutInPropagator(CFGVisitor):
     return data
       
   def visitAssignStmt(self, cfg: AssignStmt, data : Data):
-    for sym in set(self.st.symbols) - get_referred_symbols(cfg, self.st):
-        data.obj[(cfg.id, sym.id, 'in')] = data.obj[(cfg.id, sym.id, 'out')]
+    for symbol in set(self.st.symbols) - ReferredSymbolGetter(cfg, self.st).get():
+        data.obj[(cfg.id, symbol.id, 'in')] = data.obj[(cfg.id, symbol.id, 'out')]
 
     return data
 
@@ -153,8 +168,8 @@ class SuccessorPropagator(CFGVisitor):
         return data
       else:
         for succ_stmt in succ_stmts:
-          if data.obj[(succ_stmt.id, sym, 'in')] == True:
-            data.obj[(cfg.cond.id, sym, 'out')] = True
+          if data.obj[(succ_stmt.id, symbol, 'in')] == True:
+            data.obj[(cfg.cond.id, symbol, 'out')] = True
     else:
       for stmt in reversed(cfg.stmts):
         data = self.visit(stmt, data)
@@ -164,8 +179,8 @@ class SuccessorPropagator(CFGVisitor):
   def visitAssignStmt(self, cfg: AssignStmt, data : Data):
     succ_stmts = self.cfg.get_successors(cfg)
     if len(succ_stmts) > 0:
-      for sym in set(self.st.symbols):
+      for symbol in set(self.st.symbols):
         for succ_stmt in succ_stmts:
-          if data.obj[(succ_stmt.id, sym.id, 'in')] == True:
-            data.obj[(cfg.id, sym.id, 'out')] = True  
+          if data.obj[(succ_stmt.id, symbol.id, 'in')] == True:
+            data.obj[(cfg.id, symbol.id, 'out')] = True  
     return data

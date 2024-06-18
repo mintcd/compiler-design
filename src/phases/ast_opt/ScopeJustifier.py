@@ -157,8 +157,6 @@ class ScopeJustifier(ASTVisitor):
         similar_syms = [sym for sym in self.st.symbols if sym.name == ast.name and len(sym.scope) < len(current_stmt.id)]
         similar_syms = sorted(similar_syms, key= lambda sym: len(sym.scope), reverse=True)
 
-        # print("Visiting", ast, "\nData", data, "\nSimilar symbols", similar_syms,"\n")
-
         for sym in similar_syms:
           if current_stmt.id[:len(sym.scope)] == sym.scope:
             ast.id = sym.id

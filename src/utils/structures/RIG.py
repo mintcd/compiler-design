@@ -1,8 +1,11 @@
 from typing import Tuple, List
+from utils.structures.CFG import CFG
+from utils.structures.SymbolTable import SymbolTable
+from utils.structures.AST import Void
 
 class Node:
-  def __init__(self, name, degree = 0, avail = True, reg = None):
-    self.name = name
+  def __init__(self, symbol, degree = 0, avail = True, reg = None):
+    self.symbol = symbol 
     self.degree = degree
     self.avail = True
     self.reg = reg
@@ -21,24 +24,34 @@ class Edge:
     return f"({self.nodes[0].name}, {self.nodes[1].name})"
 
 class RIG:
-  def __init__(self, live : dict):
-    self.live = live
-    self.num_node = 0
+  def __init__(self, cfg : CFG, st : SymbolTable, log_file = None):
+    self.cfg = cfg
+    self.st = st
+    self.log_file = log_file
+
     self.nodes : List[Node] = []
     self.edges : List[Edge] = []
+
+    self.num_node = 0
   
   def __str__(self):
     return (f"Nodes: [{', '.join(str(node) for node in self.nodes)}]\n"
             f"Edges: [{', '.join(str(edge) for edge in self.edges)}]\n")
 
   def build(self):
-    for stmt_id in list(self.live.keys()):
-      for i in range(len(self.live[stmt_id])):
-        self.nodes.append(Node(self.live[stmt_id][i]))
 
-    for stmt_id in list(self.live.keys()):
-      for i in range(0, len(self.live[stmt_id])):
-        for j in range(i+1, len(self.live[stmt_id])):
+    live = {
+      stmt.id : stmt.live_symbols
+      for stmt in self.cfg.get_stmts()
+    }
+
+    for stmt_id in list(live.keys()):
+      for i in range(len(live[stmt_id])):
+        self.nodes.append(Node(live[stmt_id][i]))
+
+    for stmt_id in list(live.keys()):
+      for i in range(0, len(live[stmt_id])):
+        for j in range(i+1, len(live[stmt_id])):
           self.edges.append(Edge((self.nodes[i], self.nodes[j])))
 
     for node in self.nodes:
@@ -54,9 +67,9 @@ class RIG:
   def get_neighbors(self, node):
     neighs = list()
     for edge in self.edges:
-      if node.name == edge.nodes[0].name:
+      if node == edge.nodes[0]:
         neighs.append(edge.nodes[1])
-      if node.name == edge.nodes[1].name:
+      if node == edge.nodes[1]:
         neighs.append(edge.nodes[0])
 
     return neighs

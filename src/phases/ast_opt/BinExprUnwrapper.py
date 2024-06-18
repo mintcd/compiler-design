@@ -182,10 +182,10 @@ class BinExprUnwrapper(ASTVisitor):
     
     def visitString(self, ast, data : Data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = ast
+      data.ctx.last_datatype = String()
       return data
 
     def visitBoolean(self, ast, data : Data):
       data.ctx.last_expr = ast
-      data.ctx.last_datatype = ast
+      data.ctx.last_datatype = Boolean()
       return data
