@@ -2,6 +2,7 @@ import ply.yacc as yacc
 
 from phases.lexing.Lexer import Lexer
 from utils.structures.AST import *
+from utils.APIs import assign_info
 
 
 class Parser:
@@ -16,8 +17,9 @@ class Parser:
         ('right', 'SUB')
     )
 
-    def __init__(self, **kwargs):
-        self.parser = yacc.yacc(module=self, **kwargs)
+    def __init__(self, log_file = None):
+        self.parser = yacc.yacc(module=self)
+        self.log_file = log_file
 
     def p_program(self, p):
         '''
@@ -59,10 +61,10 @@ class Parser:
         else:
             if len(p[1]) != len(p[5]):
                 raise Exception("Names and Expressions of different lengths")
-            declLen = len(p[1])
-            # Take the name and init in the reverse order
-            p[0] = [VarDecl(p[1][i], p[3], p[5][i]) 
-                        for i in range(declLen)]
+
+            p[0] = list()
+            for i in range(len(p[1])):
+                p[0] += [VarDecl(p[1][i], p[3]), AssignStmt(Id(p[1][i]), p[5][i])]
 
     def p_funcdecl(self, p):
         '''
@@ -368,4 +370,12 @@ class Parser:
         print(f"Syntax error in input {p}")
 
     def parse(self, data):
-        return self.parser.parse(data)
+        ast = self.parser.parse(data)
+        ast = assign_info(ast)
+        
+        if self.log_file is not None:
+            with open(self.log_file, 'a') as file:
+                file.write("AST\n")
+                file.write(str(ast) + "\n")
+                file.write("----------------------------------------\n\n")
+        return ast

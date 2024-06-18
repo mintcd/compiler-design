@@ -200,11 +200,10 @@ class Void():
 ############################### Statements ##################################
 
 class AssignStmt(Stmt):
-    def __init__(self, lhs: ArrayCell or Id, rhs: Expr, typ: Type or None = None):
+    def __init__(self, lhs: ArrayCell or Id, rhs: Expr):
         super().__init__()
         self.lhs = lhs
         self.rhs = rhs
-        self.typ = typ
     def __repr__(self):
         return f"{self.id} {str(self.lhs)} := {str(self.rhs)}"
 

@@ -9,10 +9,9 @@ from phases.lexing.Lexer import Lexer
 from phases.parsing.Parser import Parser
 
 # AST optimization
-from phases.ast_opt.VarDeclUnwrapper import VarDeclUnwrapper
-from phases.ast_opt.ScopeJustifier import ScopeJustifier
 from phases.ast_opt.ForToWhile import ForToWhile
 from phases.ast_opt.BinExprUnwrapper import BinExprUnwrapper
+from phases.ast_opt.ScopeJustifier import ScopeJustifier
 
 # CFG Building
 from phases.cfg_build.CFGBuilder import CFGBuilder
@@ -36,15 +35,16 @@ def lex(string, log_file = None):
 
 def parse(string, log_file = None):
     lexer = Lexer()
-    parser = Parser()
+    parser = Parser(log_file)
 
     ast = parser.parse(string)
+
 
     return ast
 
 def optimize_ast(ast, log_file = None):
   ast = assign_info(ast)
-  ast = VarDeclUnwrapper(ast, log_file).unwrap()
+
   ast = ForToWhile(ast, log_file).refactor()
   ast = BinExprUnwrapper(ast, log_file).unwrap()
   ast = ScopeJustifier(ast, log_file).justify()

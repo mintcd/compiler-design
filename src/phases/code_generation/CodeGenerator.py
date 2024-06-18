@@ -66,7 +66,6 @@ class CodeGenerator(CFGVisitor):
       code = ""
 
       if isinstance(cfg.rhs, Atomic):
-        print(69, cfg)
         for symbol in self.st.symbols:
           if symbol.id == cfg.lhs.id:
             code += f"addi {symbol.register} 0 {cfg.rhs.val}\n"
